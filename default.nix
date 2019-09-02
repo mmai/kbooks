@@ -3,7 +3,7 @@ with import <nixpkgs> { };
 # troubleshooting : if error libmariadb.so.x not found => reinstall diesel_cli (cargo install diesel_cli)
 
 stdenv.mkDerivation rec {
-  name = "khnum-${version}";
+  name = "kbooks-${version}";
   version = "0.1.0";
   buildInputs = with pkgs; [ 
     # rustup
@@ -17,7 +17,7 @@ stdenv.mkDerivation rec {
 
   # (DATABASE_URL env variable overrides value in .env file)
   shellHook = ''
-    export DATABASE_URL=postgres://dbuser:password@localhost:5432/activue
+    export DATABASE_URL=postgres://dbuser:password@localhost:5432/kbooks
     which diesel >/dev/null 2>&1 || cargo install diesel_cli
     which cargo-tarpaulin >/dev/null 2>&1 || cargo install cargo-tarpaulin
   '';

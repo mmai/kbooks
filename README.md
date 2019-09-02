@@ -1,14 +1,9 @@
-# Khnum
+# Kbooks
 
-[![Build Status](https://travis-ci.org/mmai/khnum.svg?branch=master)](https://travis-ci.org/mmai/khnum) [![Coverage Status](https://coveralls.io/repos/github/mmai/khnum/badge.svg?branch=master)](https://coveralls.io/github/mmai/khnum?branch=master)
+A books library application built on top of Khnum (WIP)
 
-Experiments with Actix and Vuejs (WIP)
+## Installation
 
-## Start a new project based on Khnum
-
-Install framework
-```sh
-curl https://raw.githubusercontent.com/mmai/khnum/master/bin/khnum-new.sh | bash -s myproject
 ```
 Init postgresql database (with docker)
 
@@ -27,13 +22,3 @@ Start frontend developpement server
 ```sh
 make frontrun
 ```
-
-## TODO
-
-* users management
-  * [x] registration
-  * [ ] personal pages
-* [ ] i18n
-* [ ] basic crud admin
-* [ ] activitypub
-* [ ] CQRS
