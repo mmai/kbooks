@@ -25,10 +25,8 @@ use gettext_macros::{compile_i18n, include_i18n, init_i18n};
 use crate::khnum::wiring;
 
 init_i18n!("khnum", en, fr); // Put this before modules containing messages to be translated
+
 mod khnum;
-
-use crate::khnum::wiring::{DbPool, Config};
-
 
 // fn hello(
 //     session: Session,
@@ -54,7 +52,7 @@ fn main() -> std::io::Result<()> {
         // let domain: String = dotenv::var("DOMAIN").unwrap_or_else(|_| "localhost".to_string());
 
         App::new()
-            .data(Config { 
+            .data(wiring::Config { 
                 pool: pool.clone(),
                 front_url: front_url.clone()
             })

@@ -3,11 +3,11 @@ version: '3.1'
 services:
 
   postgres:
-    container_name: activue_postgres
+    container_name: postgres
     image: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: activue
+      POSTGRES_DB: kbooks
       POSTGRES_USER: dbuser
       POSTGRES_PASSWORD: password
     ports:

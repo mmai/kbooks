@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar app>
       <v-toolbar-title class="headline text-uppercase">
-        <span>khnum</span>
+        <span>Kbooks</span>
         <span class="font-weight-light"> An Actix + Vue experiment</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>

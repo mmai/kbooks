@@ -12,7 +12,7 @@
 
       <v-flex mb-4>
         <h1 class="display-2 font-weight-bold mb-3" v-translate>
-          Welcome to Khnum
+          Welcome to Kbooks
         </h1>
         <div>
           <select name="language" v-model="$language.current">
@@ -24,13 +24,6 @@
             >
           </select>
         </div>
-        <p>
-          An
-          <translate translate-comment="commentaire exemple"
-            >example of using</translate
-          >
-          Actix with Vue (+ vuex & vuetify)
-        </p>
         <h2>
           {{ message }}
         </h2>

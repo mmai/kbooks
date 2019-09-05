@@ -16,5 +16,5 @@ msgid "example of using"
 msgstr "example of using"
 
 #: front/src/views/Home.vue:13
-msgid "Welcome to Khnum"
-msgstr "Welcome to Khnum"
+msgid "Welcome to Kbooks"
+msgstr "Welcome to Kbooks"
