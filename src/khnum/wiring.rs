@@ -37,7 +37,7 @@ pub fn db_init(db_url: String) -> DbPool {
 // ================== Test database initialization
 // #[cfg(feature = "sqlite")]
 #[cfg(test)]
-embed_migrations!("migrations/khnum/sqlite");
+embed_migrations!("migrations/sqlite");
 
 // #[cfg(feature = "sqlite")]
 #[cfg(test)]

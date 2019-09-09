@@ -28,6 +28,11 @@ init_i18n!("khnum", en, fr); // Put this before modules containing messages to b
 
 mod khnum;
 
+mod schema;
+mod models;
+mod repository;
+mod controllers;
+
 // fn hello(
 //     session: Session,
 //     i18n: I18n
@@ -73,14 +78,9 @@ fn main() -> std::io::Result<()> {
                             .route(web::delete().to(khnum::users::controllers::auth::logout))
                             .route(web::get().to_async(khnum::users::controllers::auth::get_me)),
                     )
-                    // .service( web::resource("/register").route( 
-                    //         web::post().to_async(khnum::users::controllers::register::register),
-                    //     ),
-                    // )
-                    // .service( web::resource("/validate").route( 
-                    //         web::post().to_async(khnum::users::controllers::register::register),
-                    //     ),
-                    // )
+                    .service( web::resource("/book") // routes for authentication
+                            .route(web::post().to_async(controllers::book::create))
+                    )
             )
             .service( web::scope("/register") // everything under '/register/' route
                   .service( web::resource("/request").route(

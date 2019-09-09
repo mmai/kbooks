@@ -15,6 +15,19 @@ pub struct User {
     pub language: String,
 }
 
+impl User {
+    pub fn testUser () -> Self {
+        User {
+            id: 1,
+            email: "email@test.fr".to_string(),
+            login: "login".to_string(),
+            password: "password".to_string(),
+            created_at: Local::now().naive_local(),
+            language: "FR".to_string()
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Insertable)]
 #[table_name = "users"]
 pub struct NewUser {
