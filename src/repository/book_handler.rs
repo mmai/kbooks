@@ -22,6 +22,12 @@ pub fn add(pool: DbPool, book: NewBook) -> Result<(), ServiceError> {
     return Ok(());
 }
 
+pub fn list(pool: DbPool) -> Result<Vec<Book>, ServiceError> {
+    let conn = &pool.get().unwrap();
+    let items = dsl::books.load::<Book>(conn)?;
+    return Ok(items.into_iter().map(|item| item.into()).collect());
+}
+
 // pub fn fetch(pool: DbPool, email: &String, login: &String) -> Result<Vec<SlimUser>, ServiceError> {
 //     use crate::khnum::schema::users::dsl;
 //     let conn = &pool.get().unwrap();

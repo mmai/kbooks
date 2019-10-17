@@ -80,6 +80,7 @@ fn main() -> std::io::Result<()> {
                     )
                     .service( web::resource("/book") // routes for authentication
                             .route(web::post().to_async(controllers::book::create))
+                            .route( web::get().to_async(controllers::book::list))
                     )
             )
             .service( web::scope("/register") // everything under '/register/' route

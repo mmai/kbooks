@@ -94,6 +94,37 @@ pub fn create(
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BooksListCommandResult {
+    success: bool,
+    books: Vec<Book>,
+    error: Option<String>
+}
+
+pub fn list(
+    session: Session,
+    config: web::Data<Config>,
+    i18n: I18n
+) -> impl Future<Item = HttpResponse, Error = ServiceError> {
+    //TODO : bad input data
+
+    #[cfg(test)]
+    let opt = Some(users::models::User::testUser());
+
+    #[cfg(not(test))]
+    let opt = session.get::<users::models::User>("user").expect("could not get session user");
+
+    match opt {
+        None => result(Err(ServiceError::Unauthorized("User not connected".to_string()))),
+        Some(user) => {
+            //TODO : db error
+            let books = book_handler::list(config.pool.clone()).expect("error getting books list");
+            let res = BooksListCommandResult {success: true, books, error: None};
+            result(Ok(HttpResponse::Ok().json(res)))
+        },
+    }
+}
+
 // #[cfg(test)]
 // mod tests;
 //// #[path = "./book_test.rs"] // avoid creating a /register folder
@@ -141,4 +172,53 @@ fn test_create() {
     assert!(response.status().is_success());
     let result: CommandResult = response.json().wait().expect("Could not parse json"); 
     assert!(result.success);
+}
+
+use diesel::prelude::*;
+use crate::schema::books::dsl;
+#[test]
+fn test_list() {
+    dotenv().ok();
+    let mut srv = TestServer::new( || {
+        let pool = crate::khnum::wiring::test_conn_init();
+        let conn = &pool.get().unwrap();
+        let book = NewBook {
+            user_id: 1,
+            librarything_id: None,
+            title: "a title".to_string(),
+            author_lf: "Authorlf".to_string(),
+            author_code: "AUT".to_string(),
+            isbn: "1234564654654654645".to_string(),
+            publicationdate: "2019-03-02".to_string(),
+            language_original: "FR".to_string(),
+            language_main: "FR".to_string(),
+            language_secondary: None,
+            review: None,
+            rating: None,
+            cover: "".to_string(),
+            created_at: Utc::now().naive_utc(),
+            dateacquired_stamp: None,
+            started_stamp: None,
+            finished_stamp: None,
+        };
+        diesel::insert_into(dsl::books).values(&book)
+            .execute(conn).expect("Error populating test database");
+        HttpService::new(
+            App::new()
+            .data(managed_state())
+            .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
+            .service( web::resource("/book")
+                      .route( web::get().to_async(list))
+            )
+        )
+    });
+
+    let req = srv.get("/book")
+        .timeout(std::time::Duration::new(15, 0));
+        // .header( http::header::CONTENT_TYPE, http::header::HeaderValue::from_static("application/json"),);
+
+    let mut response = srv.block_on(req.send()).unwrap();
+    assert!(response.status().is_success());
+    let result: BooksListCommandResult = response.json().wait().expect("Could not parse json"); 
+    assert!(result.books.len() == 1);
 }
