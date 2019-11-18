@@ -2,7 +2,7 @@ use actix_web::{error::ResponseError, HttpResponse};
 use derive_more::Display;
 use diesel::result::{DatabaseErrorKind, Error as DBError};
 use std::convert::From;
-use uuid::ParseError;
+use uuid::Error as UuidError;
 use actix::MailboxError;
 
 #[derive(Debug, Display)]
@@ -41,8 +41,8 @@ impl From<MailboxError> for ServiceError {
 
 // we can return early in our handlers if UUID provided by the user is not valid
 // and provide a custom message
-impl From<ParseError> for ServiceError {
-    fn from(_: ParseError) -> ServiceError {
+impl From<UuidError> for ServiceError {
+    fn from(_: UuidError) -> ServiceError {
         ServiceError::BadRequest("Invalid UUID".into())
     }
 }

@@ -1,8 +1,8 @@
-use actix_web::middleware::identity::Identity;
+use actix_identity::Identity;
 use actix_session::{CookieSession, Session};
 use actix_web::{web, Error, error::BlockingError, HttpRequest, HttpResponse, Responder, ResponseError};
 
-use futures::future::{Future, result};
+use futures::future::Future;
 
 use crate::khnum::wiring::{DbPool, Config};
 use crate::khnum::errors::ServiceError;

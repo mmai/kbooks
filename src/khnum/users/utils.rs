@@ -1,10 +1,16 @@
 use bcrypt::{hash, DEFAULT_COST};
 use chrono::{Duration, Local};
 use jsonwebtoken::{decode, encode, Header, Validation};
-use url::percent_encoding::{utf8_percent_encode, percent_decode, PATH_SEGMENT_ENCODE_SET};
+use percent_encoding::{utf8_percent_encode, percent_decode, AsciiSet, CONTROLS};
 
 use crate::khnum::errors::ServiceError;
 use crate::khnum::users::models::SlimUser;
+
+// cf. https://github.com/servo/rust-url/blob/master/UPGRADING.md#upgrading-from-percent-encoding-1x-to-2x
+// and https://docs.rs/url/1.4.0/src/url/percent_encoding.rs.html#63
+const QUERY_ENCODE_SET: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'#').add(b'<').add(b'>');
+const DEFAULT_ENCODE_SET: &AsciiSet = &QUERY_ENCODE_SET.add(b'`').add(b'?').add(b'{').add(b'}');
+const PATH_SEGMENT_ENCODE_SET: &AsciiSet = &DEFAULT_ENCODE_SET.add(b'%').add(b'/');
 
 pub fn hash_password(plain: &str) -> Result<String, ServiceError> {
     // get the hashing cost from the env variable or use default

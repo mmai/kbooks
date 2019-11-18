@@ -9,10 +9,8 @@
 
 use actix::prelude::*;
 use actix_files as fs;
-use actix_web::middleware::{
-    identity::{CookieIdentityPolicy, IdentityService},
-    Logger,
-};
+use actix_identity::{CookieIdentityPolicy, IdentityService};
+use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use actix_session::{CookieSession, Session};
 use chrono::Duration;
