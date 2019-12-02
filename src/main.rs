@@ -76,9 +76,12 @@ fn main() -> std::io::Result<()> {
                             .route(web::delete().to(khnum::users::controllers::auth::logout))
                             .route(web::get().to_async(khnum::users::controllers::auth::get_me)),
                     )
-                    .service( web::resource("/book") // routes for authentication
+                    .service( web::resource("/book") // routes for books
                             .route(web::post().to_async(controllers::book::create))
                             .route( web::get().to_async(controllers::book::list))
+                    )
+                    .service( web::resource("/books") // routes for books
+                            .route( web::get().to_async(controllers::book::listsimple))
                     )
             )
             .service( web::scope("/register") // everything under '/register/' route

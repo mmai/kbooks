@@ -5,6 +5,9 @@ use chrono::{Utc, NaiveDateTime};
 use crate::schema::books;
 use crate::khnum::errors::ServiceError;
 
+use paperclip::actix::api_v2_schema;
+
+#[api_v2_schema]
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Queryable)]
 pub struct Book {
     pub id: i32,

@@ -1,5 +1,10 @@
 use actix_session::{Session};
-use actix_web::{ test, web, Error, error, HttpResponse, ResponseError, http};
+use actix_web::{ test, Error, error, HttpResponse, ResponseError, http};
+use paperclip::actix::{ 
+    web, 
+    // extension trait for actix_web::App and proc-macro attributes
+    OpenApiExt, api_v2_schema, api_v2_operation,
+};
 use chrono::{Duration, Local, NaiveDateTime, Utc };
 use futures::future::{Future, result, err};
 
@@ -47,6 +52,7 @@ fn get_or_create_author_code(author: &String) -> String {
     "ROUBAUD".to_string()
 }
 
+#[api_v2_operation]
 pub fn create(
     session: Session,
     book_form: web::Form<NewBookForm>,
@@ -94,6 +100,7 @@ pub fn create(
     }
 }
 
+#[api_v2_schema]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BooksListCommandResult {
     success: bool,
@@ -121,6 +128,31 @@ pub fn list(
             let books = book_handler::list(config.pool.clone()).expect("error getting books list");
             let res = BooksListCommandResult {success: true, books, error: None};
             result(Ok(HttpResponse::Ok().json(res)))
+        },
+    }
+}
+
+#[api_v2_operation]
+pub fn listsimple(
+    session: Session,
+    config: web::Data<Config>,
+    i18n: I18n
+) -> impl Future<Item = web::Json<BooksListCommandResult>, Error = ServiceError> {
+    //TODO : bad input data
+
+    #[cfg(test)]
+    let opt = Some(users::models::User::testUser());
+
+    #[cfg(not(test))]
+    let opt = session.get::<users::models::User>("user").expect("could not get session user");
+
+    match opt {
+        None => result(Err(ServiceError::Unauthorized("User not connected".to_string()))),
+        Some(user) => {
+            //TODO : db error
+            let books = book_handler::list(config.pool.clone()).expect("error getting books list");
+            let res = BooksListCommandResult {success: true, books, error: None};
+            result(Ok(web::Json(res)))
         },
     }
 }
@@ -207,8 +239,11 @@ fn test_list() {
             App::new()
             .data(managed_state())
             .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
+            .wrap_api()
+            // Mount the JSON spec at this path.
+            .with_json_spec_at("/api/spec")
             .service( web::resource("/book")
-                      .route( web::get().to_async(list))
+                      .route( web::get().to_async(listsimple))
             )
         )
     });
@@ -221,4 +256,11 @@ fn test_list() {
     assert!(response.status().is_success());
     let result: BooksListCommandResult = response.json().wait().expect("Could not parse json"); 
     assert!(result.books.len() == 1);
+
+
+
+    let req = srv.get("/api/spec")
+        .timeout(std::time::Duration::new(15, 0));
+    let mut response = srv.block_on(req.send()).unwrap();
+    assert!(response.status().is_success());
 }

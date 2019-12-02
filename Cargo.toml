@@ -40,6 +40,8 @@ gettext = { git = "https://github.com/Plume-org/gettext/", rev = "294c54d74c699f
 gettext-macros = { git = "https://github.com/Plume-org/gettext-macros/", rev = "a7c605f7edd6bfbfbfe7778026bfefd88d82db10" }
 gettext-utils = { git = "https://github.com/Plume-org/gettext-macros/", rev = "a7c605f7edd6bfbfbfe7778026bfefd88d82db10" }
 actix-identity = "0.1.0"
+# paperclip = { version = "0.3.0", features = ["actix"] } # XXX not updated with the last from github ?, do not compile
+paperclip = { git = "https://github.com/wafflespeanut/paperclip", features = ["actix", "uid", "datetime"] }
 
 [dependencies.actix_i18n]
 version = "0.5"
