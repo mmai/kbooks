@@ -23,16 +23,18 @@ pub struct AuthData {
 //     error: Option<String>
 // }
 
-pub fn login(
+pub async fn login(
     auth_data: web::Form<AuthData>,
     session: Session,
     id: Identity,
     config: web::Data<Config>,
-    ) -> impl Future<Item = HttpResponse, Error = ServiceError> {
+    ) -> Result<HttpResponse, ServiceError> {
+    // ) -> Result<HttpResponse, Error> {
     let data: AuthData = auth_data.into_inner();
 
-    web::block( move || auth_handler::auth(config.pool.clone(), data.login, data.password))
-        .then(move |res| { 
+    let res = web::block( move || auth_handler::auth(config.pool.clone(), data.login, data.password)).await;
+    // web::block( move || auth_handler::auth(config.pool.clone(), data.login, data.password))
+    //     .then(move |res| { 
             match res {
             Ok(user) => {
                 //Via jwt
@@ -56,10 +58,11 @@ pub fn login(
             //     BlockingError::Error(service_error) => Err(service_error),
             //     // Ok(err.error_response())
             // }
-        }})
+        }
+// })
 }
 
-pub fn logout( session: Session, id: Identity) -> impl Responder {
+pub async fn logout( session: Session, id: Identity) -> impl Responder {
     session.clear();
     id.forget();
     HttpResponse::Ok()

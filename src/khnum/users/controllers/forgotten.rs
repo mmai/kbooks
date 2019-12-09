@@ -2,7 +2,7 @@ use actix_session::{CookieSession, Session};
 use actix_web::{ test, web, Error, error, HttpResponse, ResponseError, http};
 use bcrypt::verify;
 use chrono::{Duration, Local, NaiveDateTime};
-use futures::future::{Future, result, err};
+use futures::future::{Future, err};
 
 use url::form_urlencoded;
 
@@ -36,17 +36,17 @@ pub struct RequestForm {
 pub fn request(
     form_data: web::Form<RequestForm>,
     config: web::Data<Config>
-) -> impl Future<Item = HttpResponse, Error = ServiceError> {
+) -> Result<HttpResponse, ServiceError> {
     let form_data = form_data.into_inner();
 
     let email_exists = user_handler::email_exists(config.pool.clone(), &form_data.email).expect("error when checking email");
     if !email_exists {
         let cde_res = CommandResult {success: false, error: Some(String::from("Email does not exists"))};
-        result(Ok(HttpResponse::Ok().json(cde_res)))
+        Ok(HttpResponse::Ok().json(cde_res))
     } else {
         let expires_at = Local::now().naive_local() + Duration::hours(24);
         let res = send_confirmation(form_data.email, expires_at);
-        result(Ok(HttpResponse::Ok().json(res)))
+        Ok(HttpResponse::Ok().json(res))
     }
 }
 
@@ -56,7 +56,7 @@ pub fn check(
     data: web::Path<(String, String, String)>, 
     ) 
     // -> impl Future<Item = HttpResponse, Error = Error> {
-    -> Box<Future<Item = HttpResponse, Error = ServiceError>> {
+    -> Box<Result<HttpResponse, ServiceError>> {
 
     //Verify link
     let hashlink = from_url(&data.0);
@@ -85,8 +85,8 @@ pub fn check(
         });
     // println!("{:#?}", validate_result);
     match validate_result {
-        Err(res) => Box::new(result(Ok(HttpResponse::Ok().json(res)))),
-        Ok(res) => Box::new(result(Ok(HttpResponse::Ok().json(res))))
+        Err(res) => Box::new(Ok(HttpResponse::Ok().json(res))),
+        Ok(res) => Box::new(Ok(HttpResponse::Ok().json(res)))
     }
 }
 
@@ -101,7 +101,7 @@ pub fn change_password(
     form_data: web::Form<PasswordForm>,
     config: web::Data<Config>,
 // ) -> impl Future<Item = HttpResponse, Error = ServiceError> {
-) -> impl Future<Item = HttpResponse, Error = ServiceError> {
+) -> Result<HttpResponse, Error> {
     let form_data = form_data.into_inner();
 
     let res = {
@@ -116,7 +116,7 @@ pub fn change_password(
             Ok( HttpResponse::Ok().json(CommandResult {success: true, error: None}))
         }
     };
-    result(res)
+    res
 }
 
 fn make_confirmation_data(msg: &str) -> String {

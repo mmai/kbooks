@@ -1,9 +1,10 @@
+use actix::MailboxError;
 use actix_web::{error::ResponseError, HttpResponse};
+// use actix_threadpool;
 use derive_more::Display;
 use diesel::result::{DatabaseErrorKind, Error as DBError};
 use std::convert::From;
 use uuid::Error as UuidError;
-use actix::MailboxError;
 
 #[derive(Debug, Display)]
 pub enum ServiceError {
@@ -46,6 +47,17 @@ impl From<UuidError> for ServiceError {
         ServiceError::BadRequest("Invalid UUID".into())
     }
 }
+
+// impl From<actix_threadpool::BlockingError> for ServiceError {
+//     fn from(error: actix_threadpool::BlockingError) -> ServiceError {
+//         match error {
+//             _ => {
+//                 // println!("debug: default error {:?}", error);
+//                 ServiceError::InternalServerError
+//             },
+//         }
+//     }
+// }
 
 impl From<DBError> for ServiceError {
     fn from(error: DBError) -> ServiceError {

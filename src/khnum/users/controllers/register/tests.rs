@@ -24,7 +24,7 @@ pub fn managed_state() -> Translations {
 #[test]
 fn test_request() {
     dotenv().ok();
-    let mut srv = TestServer::new( || {
+    let mut srv = TestServer::with( || {
         let pool = crate::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
@@ -38,7 +38,7 @@ fn test_request() {
             .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")}).service(
                 web::scope("/register") // everything under '/register/' route
                     .service( web::resource("/request").route(
-                        web::post().to_async(users::controllers::register::request)
+                        web::post().to(users::controllers::register::request)
                     )
                 )
             )
@@ -83,7 +83,7 @@ use regex::Regex;
 #[test]
 fn test_validate() {
     dotenv().ok();
-    let mut srv = TestServer::new( move || {
+    let mut srv = TestServer::with( move || {
         let pool = crate::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
@@ -100,11 +100,11 @@ fn test_validate() {
             .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .service( web::resource("/register/request").route( // To test insertions 
-                web::post().to_async(users::controllers::register::request)
+                web::post().to(users::controllers::register::request)
             ))
             // .service( web::resource("/register/{hashlink}/{login}/{expires_at}/{register_url}").route(
             .service( web::resource("/register/register/{hashlink}/{login}/{hpass}/{email}/{expires_at}").route(
-                web::get().to_async(users::controllers::register::register)
+                web::get().to(users::controllers::register::register)
             ))
         )
     });

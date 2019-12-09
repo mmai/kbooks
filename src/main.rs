@@ -72,25 +72,25 @@ fn main() -> std::io::Result<()> {
             // ))
             .service( web::scope("/api") // everything under '/api/' route
                     .service( web::resource("/auth") // routes for authentication
-                            .route(web::post().to_async(khnum::users::controllers::auth::login))
+                            .route(web::post().to(khnum::users::controllers::auth::login))
                             .route(web::delete().to(khnum::users::controllers::auth::logout))
-                            .route(web::get().to_async(khnum::users::controllers::auth::get_me)),
+                            .route(web::get().to(khnum::users::controllers::auth::get_me)),
                     )
                     .service( web::resource("/book") // routes for authentication
-                            .route(web::post().to_async(controllers::book::create))
-                            .route( web::get().to_async(controllers::book::list))
+                            .route(web::post().to(controllers::book::create))
+                            .route( web::get().to(controllers::book::list))
                     )
             )
             .service( web::scope("/register") // everything under '/register/' route
                   .service( web::resource("/request").route(
-                      web::post().to_async(khnum::users::controllers::register::request)
+                      web::post().to(khnum::users::controllers::register::request)
                   ))
                   // route to validate registration
                   .service( web::resource("/register/{hashlink}/{login}/{hpass}/{email}/{expires_at}").route(
-                          web::get().to_async(khnum::users::controllers::register::register)
+                          web::get().to(khnum::users::controllers::register::register)
                   ))
                   // .service( web::resource("/validate").route(
-                  //         web::post().to_async(khnum::users::controllers::register::register)
+                  //         web::post().to(khnum::users::controllers::register::register)
                   // ))
             )
             // .service( web::resource("/hello").route(

@@ -17,7 +17,7 @@ use crate::khnum::wiring::Config;
 #[test]
 fn test_request() {
     dotenv().ok();
-    let mut srv = TestServer::new( || {
+    let mut srv = TestServer::with( || {
         let pool = crate::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
@@ -28,7 +28,7 @@ fn test_request() {
         HttpService::new(
             App::new().data(Config {pool: pool.clone(), front_url: String::from("http://dummy")}).service(
                 web::resource("/user/forgotten").route(
-                    web::post().to_async(users::controllers::forgotten::request)
+                    web::post().to(users::controllers::forgotten::request)
                 )
             )
         )
@@ -65,7 +65,7 @@ use regex::Regex;
 #[test]
 fn test_link() {
     dotenv().ok();
-    let mut srv = TestServer::new( move || {
+    let mut srv = TestServer::with( move || {
         let pool = crate::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
@@ -77,13 +77,13 @@ fn test_link() {
             App::new().data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .service( web::resource("/user/forgotten").route( // To test insertions 
-                web::post().to_async(users::controllers::forgotten::request)
+                web::post().to(users::controllers::forgotten::request)
             ))
             .service( web::resource("/user/forgotten/{hashlink}/{email}/{expires_at}").route(
-                web::get().to_async(users::controllers::forgotten::check)
+                web::get().to(users::controllers::forgotten::check)
             ))
             .service( web::resource("/user/changepassword").route( 
-                web::post().to_async(users::controllers::forgotten::change_password),
+                web::post().to(users::controllers::forgotten::change_password),
             ))
         )
     });

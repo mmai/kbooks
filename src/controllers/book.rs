@@ -1,7 +1,7 @@
 use actix_session::{Session};
 use actix_web::{ test, web, Error, error, HttpResponse, ResponseError, http};
 use chrono::{Duration, Local, NaiveDateTime, Utc };
-use futures::future::{Future, result, err};
+use futures::future::{Future, err};
 
 //For tests
 use dotenv::dotenv;
@@ -47,12 +47,12 @@ fn get_or_create_author_code(author: &String) -> String {
     "ROUBAUD".to_string()
 }
 
-pub fn create(
+pub async fn create(
     session: Session,
     book_form: web::Form<NewBookForm>,
     config: web::Data<Config>,
     i18n: I18n
-) -> impl Future<Item = HttpResponse, Error = ServiceError> {
+) -> Result<HttpResponse, ServiceError> {
     //TODO : bad input data
     let book_form = book_form.into_inner();
 
@@ -63,7 +63,7 @@ pub fn create(
     let opt = session.get::<users::models::User>("user").expect("could not get session user");
 
     match opt {
-        None => result(Err(ServiceError::Unauthorized("User not connected".to_string()))),
+        None => Err(ServiceError::Unauthorized("User not connected".to_string())),
         Some(user) => {
             let author_code = get_or_create_author_code(&book_form.author);
             let book = NewBook {
@@ -89,7 +89,7 @@ pub fn create(
             //TODO : db error
             let _book = book_handler::add(config.pool.clone(), book).expect("error when inserting new book");
             let res = CommandResult {success: true, error: None};
-            result(Ok(HttpResponse::Ok().json(res)))
+            Ok(HttpResponse::Ok().json(res))
         },
     }
 }
@@ -105,7 +105,7 @@ pub fn list(
     session: Session,
     config: web::Data<Config>,
     i18n: I18n
-) -> impl Future<Item = HttpResponse, Error = ServiceError> {
+) -> Result<HttpResponse, ServiceError> {
     //TODO : bad input data
 
     #[cfg(test)]
@@ -115,12 +115,12 @@ pub fn list(
     let opt = session.get::<users::models::User>("user").expect("could not get session user");
 
     match opt {
-        None => result(Err(ServiceError::Unauthorized("User not connected".to_string()))),
+        None => Err(ServiceError::Unauthorized("User not connected".to_string())),
         Some(user) => {
             //TODO : db error
             let books = book_handler::list(config.pool.clone()).expect("error getting books list");
             let res = BooksListCommandResult {success: true, books, error: None};
-            result(Ok(HttpResponse::Ok().json(res)))
+            Ok(HttpResponse::Ok().json(res))
         },
     }
 }
@@ -138,7 +138,7 @@ pub fn managed_state() -> Translations {
 #[test]
 fn test_create() {
     dotenv().ok();
-    let mut srv = TestServer::new( || {
+    let mut srv = TestServer::with( || {
         let pool = crate::khnum::wiring::test_conn_init();
         let conn = &pool.get().unwrap();
         HttpService::new(
@@ -147,7 +147,7 @@ fn test_create() {
             .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")}).service(
                 web::scope("/book")
                     .service( web::resource("/create").route(
-                        web::post().to_async(create)
+                        web::post().to(create)
                     )
                 )
             )
@@ -179,7 +179,7 @@ use crate::schema::books::dsl;
 #[test]
 fn test_list() {
     dotenv().ok();
-    let mut srv = TestServer::new( || {
+    let mut srv = TestServer::with( || {
         let pool = crate::khnum::wiring::test_conn_init();
         let conn = &pool.get().unwrap();
         let book = NewBook {
@@ -208,7 +208,7 @@ fn test_list() {
             .data(managed_state())
             .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
             .service( web::resource("/book")
-                      .route( web::get().to_async(list))
+                      .route( web::get().to(list))
             )
         )
     });

@@ -3,7 +3,7 @@ use actix_http::cookie::Cookie;
 use actix_web::{ test, web, Error, error, HttpResponse, ResponseError, http};
 use bcrypt::verify;
 use chrono::{Duration, Local, NaiveDateTime};
-use futures::future::{Future, result, err};
+use futures::future::{Future, err};
 
 use url::form_urlencoded;
 
@@ -40,40 +40,40 @@ pub struct RequestForm {
     password: String
 }
 
-pub fn request(
+pub async fn request(
     form_data: web::Form<RequestForm>,
     config: web::Data<Config>,
     i18n: I18n
-) -> impl Future<Item = HttpResponse, Error = ServiceError> {
+) -> Result<HttpResponse, Error> {
     let form_data = form_data.into_inner();
     let res = check_existence(config.pool.clone(), &form_data.email, &form_data.username);
     match res {
         Ok(cde_res) => {
             if !cde_res.success {
-                result(Ok(HttpResponse::Ok().json(cde_res)))
+                Ok(HttpResponse::Ok().json(cde_res))
             } else {
                 let hashed_password = hash_password(&form_data.password).expect("Error hashing password");
                 let expires_at = Local::now().naive_local() + Duration::hours(24);
                 // panic!(" avant send_confirmation");
                 let res = send_confirmation(&i18n.catalog, form_data.username, hashed_password, form_data.email, expires_at);
-                result(Ok(HttpResponse::Ok().json(res)))
+                Ok(HttpResponse::Ok().json(res))
             }
         }
         Err(err) => {
-           result(Err(err))
+           Err(err)
         }
     }
 }
 
 // ---------------- Validate link action and finish registration ------------
-pub fn register( 
+pub async fn register( 
     config: web::Data<Config>,
     session: Session,
     i18n: I18n,
     data: web::Path<(String, String, String, String, String)>, 
     ) 
     // -> impl Future<Item = HttpResponse, Error = Error> {
-    -> Box<Future<Item = HttpResponse, Error = ServiceError>> {
+    -> Box<Result<HttpResponse, ServiceError>> {
 
     //Verify link
     let hashlink = from_url(&data.0);
@@ -108,7 +108,7 @@ pub fn register(
         });
 
     match validate_result {
-        Err(res) => Box::new(result(Ok(HttpResponse::Ok().json(res)))),
+        Err(res) => Box::new(Ok(HttpResponse::Ok().json(res))),
         Ok(res) => {
             if res.success {
                 // let _ = session.set("flashmessage", "Thank your for registering. You can now log in");
@@ -119,15 +119,15 @@ pub fn register(
                 //     .http_only(true)
                 //     .max_age(84600)
                 //     .finish();
-                Box::new(result(Ok(
+                Box::new(Ok(
                             HttpResponse::Found()
                             .header(http::header::LOCATION, make_front_url(&config.front_url, "/?action=registerOk") )
                             // .cookie(cookie)
                             .finish()
                             .into_body()
-                )))
+                ))
             } else {
-                Box::new(result(Ok(HttpResponse::Ok().json(res))))
+                Box::new(Ok(HttpResponse::Ok().json(res)))
             }
         }
     }
@@ -140,7 +140,7 @@ pub struct ValidateForm {
     password: String,
 }
 
-fn check_existence(pool: DbPool, email: &String, login: &String) -> Result<CommandResult, ServiceError> {
+fn check_existence(pool: DbPool, email: &String, login: &String) -> Result<CommandResult, Error> {
     let res = user_handler::fetch(pool, email, login);
     match res {
         Ok(users) => {

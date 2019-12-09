@@ -17,7 +17,7 @@ use crate::khnum::wiring::Config;
 #[test]
 fn test_login() {
     dotenv().ok();
-    let mut srv = TestServer::new( || {
+    let mut srv = TestServer::with( || {
         let pool = crate::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
@@ -30,15 +30,15 @@ fn test_login() {
             App::new().data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .service( web::resource("/auth") // routes for authentication
-                      .route(web::post().to_async(users::controllers::auth::login))
+                      .route(web::post().to(users::controllers::auth::login))
                       .route(web::delete().to(users::controllers::auth::logout))
-                      .route(web::get().to_async(users::controllers::auth::get_me)),
+                      .route(web::get().to(users::controllers::auth::get_me)),
                       )
             // .service( web::resource("/login").route(
-            //         web::post().to_async(users::controllers::auth::login)
+            //         web::post().to(users::controllers::auth::login)
             // ))
             // .service( web::resource("/me").route(
-            //         web::post().to_async(users::controllers::auth::get_me)
+            //         web::post().to(users::controllers::auth::get_me)
             // ))
         )
     });
@@ -101,7 +101,7 @@ use regex::Regex;
 #[test]
 fn test_logout() {
     dotenv().ok();
-    let mut srv = TestServer::new( || {
+    let mut srv = TestServer::with( || {
         let pool = crate::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
@@ -114,18 +114,18 @@ fn test_logout() {
             App::new().data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .service( web::resource("/auth") // routes for authentication
-                      .route(web::post().to_async(users::controllers::auth::login))
+                      .route(web::post().to(users::controllers::auth::login))
                       .route(web::delete().to(users::controllers::auth::logout))
-                      .route(web::get().to_async(users::controllers::auth::get_me)),
+                      .route(web::get().to(users::controllers::auth::get_me)),
                       )
             // .service( web::resource("/login").route(
-            //         web::post().to_async(users::controllers::auth::login)
+            //         web::post().to(users::controllers::auth::login)
             // ))
             // .service( web::resource("/logout").route(
             //         web::get().to(users::controllers::auth::logout)
             // ))
             // .service( web::resource("/me").route(
-            //         web::get().to_async(users::controllers::auth::get_me)
+            //         web::get().to(users::controllers::auth::get_me)
             // ))
         )
     });
