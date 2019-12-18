@@ -33,7 +33,7 @@ pub struct RequestForm {
     email: String
 }
 
-pub fn request(
+pub async fn request(
     form_data: web::Form<RequestForm>,
     config: web::Data<Config>
 ) -> Result<HttpResponse, ServiceError> {
@@ -51,7 +51,7 @@ pub fn request(
 }
 
 // ---------------- Validate link action ------------
-pub fn check( 
+pub async fn check( 
     session: Session,
     data: web::Path<(String, String, String)>, 
     ) 
@@ -96,7 +96,7 @@ pub struct PasswordForm {
     password: String,
 }
 
-pub fn change_password(
+pub async fn change_password(
     session: Session,
     form_data: web::Form<PasswordForm>,
     config: web::Data<Config>,

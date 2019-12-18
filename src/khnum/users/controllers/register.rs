@@ -72,8 +72,7 @@ pub async fn register(
     i18n: I18n,
     data: web::Path<(String, String, String, String, String)>, 
     ) 
-    // -> impl Future<Item = HttpResponse, Error = Error> {
-    -> Box<Result<HttpResponse, ServiceError>> {
+    -> Result<HttpResponse, ServiceError> {
 
     //Verify link
     let hashlink = from_url(&data.0);
@@ -108,7 +107,7 @@ pub async fn register(
         });
 
     match validate_result {
-        Err(res) => Box::new(Ok(HttpResponse::Ok().json(res))),
+        Err(res) => Ok(HttpResponse::Ok().json(res)),
         Ok(res) => {
             if res.success {
                 // let _ = session.set("flashmessage", "Thank your for registering. You can now log in");
@@ -119,15 +118,15 @@ pub async fn register(
                 //     .http_only(true)
                 //     .max_age(84600)
                 //     .finish();
-                Box::new(Ok(
+                Ok(
                             HttpResponse::Found()
                             .header(http::header::LOCATION, make_front_url(&config.front_url, "/?action=registerOk") )
                             // .cookie(cookie)
                             .finish()
                             .into_body()
-                ))
+                )
             } else {
-                Box::new(Ok(HttpResponse::Ok().json(res)))
+                Ok(HttpResponse::Ok().json(res))
             }
         }
     }

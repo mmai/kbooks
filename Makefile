@@ -50,7 +50,7 @@ migrate:
 # sentry: 
 # 	docker-compose -f sentry-docker-compose.yml up 
 test:
-	cargo +nightly test
+	cargo +nightly-2019-11-29 test
 	# cargo test
 coverage:
 	# launch tests & coverage, for tests only: "cargo test"

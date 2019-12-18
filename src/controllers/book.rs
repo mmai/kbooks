@@ -101,7 +101,7 @@ pub struct BooksListCommandResult {
     error: Option<String>
 }
 
-pub fn list(
+pub async fn list(
     session: Session,
     config: web::Data<Config>,
     i18n: I18n

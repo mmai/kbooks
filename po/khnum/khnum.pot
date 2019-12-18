@@ -12,10 +12,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-# src/khnum/users/controllers/register.rs:190
+# src/khnum/users/controllers/register.rs:189
 msgid "Please click on the link below to complete registration"
 msgstr ""
 
-# src/khnum/users/controllers/register.rs:191
+# src/khnum/users/controllers/register.rs:190
 msgid "your Invitation expires on"
 msgstr ""

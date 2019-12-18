@@ -14,10 +14,10 @@ use crate::khnum::users::models::{FrontUser, User, NewUser};
 use crate::khnum::users::utils::{hash_password};
 use crate::khnum::wiring::Config;
 
-#[test]
-fn test_login() {
+#[actix_rt::test]
+async fn test_login() {
     dotenv().ok();
-    let mut srv = TestServer::with( || {
+    let srv = test::start(|| {
         let pool = crate::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
@@ -26,7 +26,6 @@ fn test_login() {
         diesel::insert_into(dsl::users).values(&user)
             .execute(conn).expect("Error populating test database");
 
-        HttpService::new(
             App::new().data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .service( web::resource("/auth") // routes for authentication
@@ -40,7 +39,6 @@ fn test_login() {
             // .service( web::resource("/me").route(
             //         web::post().to(users::controllers::auth::get_me)
             // ))
-        )
     });
 
     //==== Test login
@@ -50,22 +48,22 @@ fn test_login() {
     let mut req = srv.post("/auth")
         // .header(http::header::CONTENT_TYPE, "application/json") // pour version send_body
         .timeout(Duration::new(15, 0));
-    let mut response = srv.block_on(req.send_form(&form)).unwrap();
-        // srv.block_on(req.send_body(r#"{"login":"login","password":"12345678"}"#)).unwrap();
+    // let mut response = srv.block_on(req.send_form(&form)).unwrap();
+    let mut response = req.send_form(&form).await.unwrap();
     assert!(response.status().is_success());
-    let user: FrontUser = response.json().wait().expect("Could not parse json"); 
+    let user: FrontUser = response.json().await.expect("Could not parse json"); 
     assert_eq!(user.email, String::from("email@toto.fr"));
-    let parse_user: Result<User, awc::error::JsonPayloadError> = response.json().wait();
+    let parse_user: Result<User, awc::error::JsonPayloadError> = response.json().await;
     assert!(parse_user.is_err());
     // let result: CommandResult = response.json().wait().expect("Could not parse json"); 
     // assert!(result.success);
     //should get user email
     let mut req = srv.get("/auth").timeout(Duration::new(15, 0));
     req = keep_session(response, req); //Via session cookie
-    let mut response = srv.block_on(req.send()).unwrap();
+    let mut response = req.send().await.unwrap();
     // println!("get me : {:#?}", response);
     assert!(response.status().is_success());
-    let user: FrontUser = response.json().wait().expect("Could not parse json"); 
+    let user: FrontUser = response.json().await.expect("Could not parse json"); 
     assert_eq!(user.email, String::from("email@toto.fr"));
 
     //======== Test request with bad password
@@ -74,7 +72,7 @@ fn test_login() {
         password: String::from("bad"),
     };
     let req = srv.post("/auth").timeout(Duration::new(15, 0));
-    let response = srv.block_on(req.send_form(&bad));
+    let response = req.send_form(&bad).await;
     println!(" bad : {:#?}", response);
     // assert!(!response.unwrap().status().is_success());
     assert_eq!("401", response.unwrap().status().as_str());
@@ -87,7 +85,7 @@ fn test_login() {
     let req = srv.post("/auth").timeout(Duration::new(15, 0));
 
     println!(" unknown get..");
-    let response = srv.block_on(req.send_form(&unknown));
+    let response = req.send_form(&unknown).await;
     // let response = srv.block_on(req.send_form(&unknown)).unwrap();
     println!(" unknown : {:#?}", response);
     assert!(!response.unwrap().status().is_success());
@@ -101,7 +99,7 @@ use regex::Regex;
 #[test]
 fn test_logout() {
     dotenv().ok();
-    let mut srv = TestServer::with( || {
+    let srv = test::start(|| {
         let pool = crate::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
@@ -110,7 +108,6 @@ fn test_logout() {
         diesel::insert_into(dsl::users).values(&user)
             .execute(conn).expect("Error populating test database");
 
-        HttpService::new(
             App::new().data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .service( web::resource("/auth") // routes for authentication
@@ -127,7 +124,6 @@ fn test_logout() {
             // .service( web::resource("/me").route(
             //         web::get().to(users::controllers::auth::get_me)
             // ))
-        )
     });
 
     // Login

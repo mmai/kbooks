@@ -6,15 +6,16 @@ edition = "2018"
 
 [dependencies]
 actix = { version = "0.8.3", features = ["http"] }
-actix-http = "1.0.0-alpha.3"
+actix-http = "1.0.0"
 actix-http-test = "1.0.0-alpha.3"
-actix-rt = "1.0.0-alpha.3"
-actix-web = "2.0.0-alpha.3"
+actix-rt = "1.0.0"
+actix-web = "2.0.0-alpha.6"
 actix-files = "0.2.0-alpha.3"
 actix-session = "0.3.0-alpha.3"
 actix-identity = "0.2.0-alpha.1"
 # actix-utils = "1.0.0-alpha.3" # for async body responses with mspc ? cf examples/basic
 # actix-threadpool = "0.3.0"
+# actix-service = "1.0.0"
 
 jsonwebtoken = "7.0.0-alpha.2"
 lettre = "0.9.2"
@@ -51,7 +52,6 @@ gettext-utils = { git = "https://github.com/Plume-org/gettext-macros/", rev = "a
 version = "0.6"
 # git = "https://github.com/mmai/actix_i18n"
 path = "../actix_i18n"
-branch = "actix-2.0"
 
 [features]
 default = ["postgres"]
