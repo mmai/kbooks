@@ -7,8 +7,6 @@ use futures::future::{Future, err};
 use dotenv::dotenv;
 use actix_web::{ App};
 // use actix_web::{web, test, http, App};
-use actix_http::HttpService;
-use actix_http_test::TestServer;
 use actix_i18n::Translations;
 use gettext_macros::include_i18n;
 
@@ -135,23 +133,21 @@ pub fn managed_state() -> Translations {
     include_i18n!()
 }
 
-#[test]
-fn test_create() {
+#[actix_rt::test]
+async fn test_create() {
     dotenv().ok();
-    let mut srv = TestServer::with( || {
+    let srv = test::start( || {
         let pool = crate::khnum::wiring::test_conn_init();
         let conn = &pool.get().unwrap();
-        HttpService::new(
-            App::new()
+        App::new()
             .data(managed_state())
             .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")}).service(
-                web::scope("/book")
-                    .service( web::resource("/create").route(
-                        web::post().to(create)
-                    )
-                )
+                                                                                                web::scope("/book")
+                                                                                                .service( web::resource("/create").route(
+                                                                                                        web::post().to(create)
+                                                                                                )
+                                                                                                )
             )
-        )
     });
 
     let form = NewBookForm { 
@@ -168,18 +164,18 @@ fn test_create() {
         .timeout(std::time::Duration::new(15, 0));
         // .header( http::header::CONTENT_TYPE, http::header::HeaderValue::from_static("application/json"),);
 
-    let mut response = srv.block_on(req.send_form(&form)).unwrap();
+    let mut response = req.send_form(&form).await.unwrap();
     assert!(response.status().is_success());
-    let result: CommandResult = response.json().wait().expect("Could not parse json"); 
+    let result: CommandResult = response.json().await.expect("Could not parse json"); 
     assert!(result.success);
 }
 
 use diesel::prelude::*;
 use crate::schema::books::dsl;
-#[test]
-fn test_list() {
+#[actix_rt::test]
+async fn test_list() {
     dotenv().ok();
-    let mut srv = TestServer::with( || {
+    let srv = test::start( || {
         let pool = crate::khnum::wiring::test_conn_init();
         let conn = &pool.get().unwrap();
         let book = NewBook {
@@ -203,22 +199,20 @@ fn test_list() {
         };
         diesel::insert_into(dsl::books).values(&book)
             .execute(conn).expect("Error populating test database");
-        HttpService::new(
-            App::new()
+        App::new()
             .data(managed_state())
             .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
             .service( web::resource("/book")
                       .route( web::get().to(list))
             )
-        )
     });
 
     let req = srv.get("/book")
         .timeout(std::time::Duration::new(15, 0));
         // .header( http::header::CONTENT_TYPE, http::header::HeaderValue::from_static("application/json"),);
 
-    let mut response = srv.block_on(req.send()).unwrap();
+    let mut response = req.send().await.unwrap();
     assert!(response.status().is_success());
-    let result: BooksListCommandResult = response.json().wait().expect("Could not parse json"); 
+    let result: BooksListCommandResult = response.json().await.expect("Could not parse json"); 
     assert!(result.books.len() == 1);
 }

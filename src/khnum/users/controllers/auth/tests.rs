@@ -1,7 +1,5 @@
 use crate::khnum::users;
 use actix_web::{web, test, http, App};
-use actix_http::HttpService;
-use actix_http_test::TestServer;
 use actix_session::{CookieSession, Session};
 use chrono::{NaiveDate, NaiveDateTime};
 use dotenv::dotenv;
@@ -48,14 +46,13 @@ async fn test_login() {
     let mut req = srv.post("/auth")
         // .header(http::header::CONTENT_TYPE, "application/json") // pour version send_body
         .timeout(Duration::new(15, 0));
-    // let mut response = srv.block_on(req.send_form(&form)).unwrap();
     let mut response = req.send_form(&form).await.unwrap();
     assert!(response.status().is_success());
     let user: FrontUser = response.json().await.expect("Could not parse json"); 
     assert_eq!(user.email, String::from("email@toto.fr"));
     let parse_user: Result<User, awc::error::JsonPayloadError> = response.json().await;
     assert!(parse_user.is_err());
-    // let result: CommandResult = response.json().wait().expect("Could not parse json"); 
+    // let result: CommandResult = response.json().await.expect("Could not parse json"); 
     // assert!(result.success);
     //should get user email
     let mut req = srv.get("/auth").timeout(Duration::new(15, 0));
@@ -86,18 +83,17 @@ async fn test_login() {
 
     println!(" unknown get..");
     let response = req.send_form(&unknown).await;
-    // let response = srv.block_on(req.send_form(&unknown)).unwrap();
     println!(" unknown : {:#?}", response);
     assert!(!response.unwrap().status().is_success());
-    // let result: CommandResult = response.json().wait().expect("Could not parse json"); 
+    // let result: CommandResult = response.json().await.expect("Could not parse json"); 
     // assert!(!result.success);
     // assert_eq!(Some(String::from("Login does not exists")), result.error);
 }
 
 use regex::Regex;
 
-#[test]
-fn test_logout() {
+#[actix_rt::test]
+async fn test_logout() {
     dotenv().ok();
     let srv = test::start(|| {
         let pool = crate::khnum::wiring::test_conn_init();
@@ -130,8 +126,8 @@ fn test_logout() {
     // let hashed_password = hash_password("password").expect("Error hashing password");
     let form = super::AuthData { login: String::from("login"), password: String::from("password")};
     let req = srv.post("/auth").timeout(Duration::new(15, 0));
-    let response = srv.block_on(req.send_form(&form)).unwrap();
-    // let result: CommandResult = response.json().wait().expect("Could not parse json"); 
+    let response = req.send_form(&form).await.unwrap();
+    // let result: CommandResult = response.json().await.expect("Could not parse json"); 
     //  Logout
     let mut req = srv
         // .delete("/auth")
@@ -139,12 +135,12 @@ fn test_logout() {
         .timeout(Duration::new(15, 0));
     req = keep_session(response, req); //Via session cookie
                         
-    let response = srv.block_on(req.send()).unwrap();
-    // let result: CommandResult = response.json().wait().expect("Could not parse json"); 
+    let response = req.send().await.unwrap();
+    // let result: CommandResult = response.json().await.expect("Could not parse json"); 
 
     let mut req = srv.get("/auth").timeout(Duration::new(15, 0));
     req = keep_session(response, req); //Via session cookie
-    let mut response = srv.block_on(req.send()).unwrap();
+    let mut response = req.send().await.unwrap();
     assert_eq!(response.status(), http::StatusCode::UNAUTHORIZED);
 }
 

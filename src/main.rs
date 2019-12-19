@@ -40,7 +40,8 @@ mod controllers;
 // }
 
 #[cfg_attr(tarpaulin, skip)]
-fn main() -> std::io::Result<()> {
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
     dotenv().ok();
     std::env::set_var( "RUST_LOG", "khnum=debug,actix_web=info,actix_server=info",);
     std::env::set_var("RUST_BACKTRACE", "1");//XXX works only for panic! macro
@@ -100,7 +101,8 @@ fn main() -> std::io::Result<()> {
             .service(fs::Files::new("/", "./static/").index_file("index.html"))
     })
     .bind("127.0.0.1:8000")?
-    .run()
+    .start()
+    .await
 }
 
 #[cfg_attr(tarpaulin, skip)]

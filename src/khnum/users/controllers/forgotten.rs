@@ -56,7 +56,7 @@ pub async fn check(
     data: web::Path<(String, String, String)>, 
     ) 
     // -> impl Future<Item = HttpResponse, Error = Error> {
-    -> Box<Result<HttpResponse, ServiceError>> {
+    -> Result<HttpResponse, ServiceError> {
 
     //Verify link
     let hashlink = from_url(&data.0);
@@ -85,8 +85,8 @@ pub async fn check(
         });
     // println!("{:#?}", validate_result);
     match validate_result {
-        Err(res) => Box::new(Ok(HttpResponse::Ok().json(res))),
-        Ok(res) => Box::new(Ok(HttpResponse::Ok().json(res)))
+        Err(res) => Ok(HttpResponse::Ok().json(res)),
+        Ok(res) => Ok(HttpResponse::Ok().json(res))
     }
 }
 

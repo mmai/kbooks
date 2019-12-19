@@ -13,6 +13,7 @@ actix-web = "2.0.0-alpha.6"
 actix-files = "0.2.0-alpha.3"
 actix-session = "0.3.0-alpha.3"
 actix-identity = "0.2.0-alpha.1"
+awc = "1.0.1"
 # actix-utils = "1.0.0-alpha.3" # for async body responses with mspc ? cf examples/basic
 # actix-threadpool = "0.3.0"
 # actix-service = "1.0.0"
@@ -36,7 +37,6 @@ serde= "1.0.103"
 serde_derive= "1.0.103"
 serde_json= "1.0.44"
 
-awc = "0.2.8"
 bcrypt = "0.6.1"
 chrono = { version = "0.4.10", features = ["serde"] }
 futures = "0.3.1"

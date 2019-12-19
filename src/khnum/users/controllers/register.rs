@@ -44,7 +44,7 @@ pub async fn request(
     form_data: web::Form<RequestForm>,
     config: web::Data<Config>,
     i18n: I18n
-) -> Result<HttpResponse, Error> {
+) -> Result<HttpResponse, ServiceError> {
     let form_data = form_data.into_inner();
     let res = check_existence(config.pool.clone(), &form_data.email, &form_data.username);
     match res {
@@ -139,7 +139,7 @@ pub struct ValidateForm {
     password: String,
 }
 
-fn check_existence(pool: DbPool, email: &String, login: &String) -> Result<CommandResult, Error> {
+fn check_existence(pool: DbPool, email: &String, login: &String) -> Result<CommandResult, ServiceError> {
     let res = user_handler::fetch(pool, email, login);
     match res {
         Ok(users) => {
