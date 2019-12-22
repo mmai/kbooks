@@ -43,7 +43,7 @@ async fn test_login() {
     // let hashed_password = hash_password("password").expect("Error hashing password");
     let password = String::from("password");
     let form = super::AuthData { login: String::from("login"), password: password};
-    let mut req = srv.post("/auth")
+    let req = srv.post("/auth")
         // .header(http::header::CONTENT_TYPE, "application/json") // pour version send_body
         .timeout(Duration::new(15, 0));
     let mut response = req.send_form(&form).await.unwrap();
@@ -140,7 +140,7 @@ async fn test_logout() {
 
     let mut req = srv.get("/auth").timeout(Duration::new(15, 0));
     req = keep_session(response, req); //Via session cookie
-    let mut response = req.send().await.unwrap();
+    let response = req.send().await.unwrap();
     assert_eq!(response.status(), http::StatusCode::UNAUTHORIZED);
 }
 

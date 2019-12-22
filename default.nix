@@ -1,6 +1,6 @@
 with import <nixpkgs> { };
 
-# troubleshooting : if error libmariadb.so.x not found => reinstall diesel_cli (cargo install diesel_cli)
+# troubleshooting : if error libmariadb.so.x not found => reinstall diesel_cli (cargo install diesel_cli --no-default-features --features postgres,sqlite)
 
 stdenv.mkDerivation rec {
   name = "kbooks-${version}";

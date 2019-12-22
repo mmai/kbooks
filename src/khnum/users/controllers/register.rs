@@ -68,7 +68,6 @@ pub async fn request(
 // ---------------- Validate link action and finish registration ------------
 pub async fn register( 
     config: web::Data<Config>,
-    session: Session,
     i18n: I18n,
     data: web::Path<(String, String, String, String, String)>, 
     ) 

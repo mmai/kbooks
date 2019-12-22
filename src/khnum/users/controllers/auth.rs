@@ -26,7 +26,7 @@ pub struct AuthData {
 pub async fn login(
     auth_data: web::Form<AuthData>,
     session: Session,
-    id: Identity,
+    _id: Identity,
     config: web::Data<Config>,
     ) -> Result<HttpResponse, ServiceError> {
     // ) -> Result<HttpResponse, Error> {
