@@ -39,6 +39,11 @@ mod controllers;
 //          HttpResponse::Ok().json(msg_expire)
 // }
 
+// #[cfg_attr(tarpaulin, skip)]
+// fn main() -> std::io::Result<()> {
+//     actix_rt::System::new("kbooks").block_on(serve())
+// }
+
 #[cfg_attr(tarpaulin, skip)]
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
