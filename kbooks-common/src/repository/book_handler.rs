@@ -1,4 +1,3 @@
-use actix_web::web;
 use chrono::{Local, NaiveDateTime};
 use diesel::prelude::*;
 use uuid::Uuid;

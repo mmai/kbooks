@@ -1,0 +1,18 @@
+[package]
+name = "kbooks-common"
+version = "0.1.0"
+authors = ["Henri Bourcereau <henri@bourcereau.fr>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bcrypt = "0.6.1"
+chrono = { version = "0.4.10", features = ["serde"] }
+
+diesel = { version = "1.4.3", features = ["postgres", "sqlite", "uuid", "r2d2", "chrono"] }
+diesel_migrations = "1.4.0"
+r2d2 = "0.8.7"
+uuid = { version = "0.8.1", features = ["serde", "v4"] }
+
+

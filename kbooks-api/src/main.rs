@@ -13,7 +13,7 @@ use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use actix_session::{CookieSession, Session};
-use chrono::Duration;
+// use chrono::Duration;
 use diesel::{r2d2::ConnectionManager};
 use dotenv::dotenv;
 

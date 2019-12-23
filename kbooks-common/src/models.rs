@@ -1,9 +1,6 @@
 use diesel::{self,RunQueryDsl,QueryDsl,ExpressionMethods};
-use actix_web::{error};
-use actix::{Message,Handler};
 use chrono::{Utc, NaiveDateTime};
 use crate::schema::books;
-use crate::khnum::errors::ServiceError;
 
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Queryable)]
 pub struct Book {

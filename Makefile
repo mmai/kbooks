@@ -17,6 +17,6 @@ run:
 	# cargo watch -x run
 	# cargo +nightly watch -x run
 	# cargo +nightly run
-	cargo +nightly-2019-11-29 run
+	cargo +nightly-2019-11-29 run -p kbooks-api
 doc:
 	cargo +nightly doc --open
