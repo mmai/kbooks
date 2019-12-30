@@ -10,12 +10,12 @@ use actix_web::{ App};
 use actix_i18n::Translations;
 use gettext_macros::include_i18n;
 
-use crate::khnum::wiring::{DbPool, Config, make_front_url};
-use crate::khnum::errors::ServiceError;
-use crate::khnum::users;
+use kbooks_common::khnum::wiring::{DbPool, Config, make_front_url};
+use kbooks_common::khnum::errors::ServiceError;
+use kbooks_common::khnum::users;
 
-use crate::repository::book_handler;
-use crate::models::{Book, NewBook};
+use kbooks_common::repository::book_handler;
+use kbooks_common::models::{Book, NewBook};
 
 use actix_i18n::I18n;
 use gettext::Catalog;
@@ -137,7 +137,7 @@ pub fn managed_state() -> Translations {
 async fn test_create() {
     dotenv().ok();
     let srv = test::start( || {
-        let pool = crate::khnum::wiring::test_conn_init();
+        let pool = kbooks_common::khnum::wiring::test_conn_init();
         let conn = &pool.get().unwrap();
         App::new()
             .data(managed_state())
@@ -171,12 +171,12 @@ async fn test_create() {
 }
 
 use diesel::prelude::*;
-use crate::schema::books::dsl;
+use kbooks_common::schema::books::dsl;
 #[actix_rt::test]
 async fn test_list() {
     dotenv().ok();
     let srv = test::start( || {
-        let pool = crate::khnum::wiring::test_conn_init();
+        let pool = kbooks_common::khnum::wiring::test_conn_init();
         let conn = &pool.get().unwrap();
         let book = NewBook {
             user_id: 1,

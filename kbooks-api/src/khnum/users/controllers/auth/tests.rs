@@ -7,16 +7,16 @@ use std::time::Duration;
 use futures::future::Future;
 
 use diesel::prelude::*;
-use crate::khnum::schema::users::dsl;
-use crate::khnum::users::models::{FrontUser, User, NewUser};
 use crate::khnum::users::utils::{hash_password};
-use crate::khnum::wiring::Config;
+use kbooks_common::khnum::schema::users::dsl;
+use kbooks_common::khnum::users::models::{FrontUser, User, NewUser};
+use kbooks_common::khnum::wiring::Config;
 
 #[actix_rt::test]
 async fn test_login() {
     dotenv().ok();
     let srv = test::start(|| {
-        let pool = crate::khnum::wiring::test_conn_init();
+        let pool = kbooks_common::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
         let hashed_password = hash_password("password").expect("Error hashing password");
@@ -96,7 +96,7 @@ use regex::Regex;
 async fn test_logout() {
     dotenv().ok();
     let srv = test::start(|| {
-        let pool = crate::khnum::wiring::test_conn_init();
+        let pool = kbooks_common::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
         let hashed_password = hash_password("password").expect("Error hashing password");

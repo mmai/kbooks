@@ -12,11 +12,11 @@ use lettre::file::FileTransport;
 use lettre::smtp::authentication::{Credentials, Mechanism};
 use lettre::sendmail::SendmailTransport;
 
-use crate::khnum::wiring::{DbPool, Config};
-use crate::khnum::errors::ServiceError;
+use kbooks_common::khnum::wiring::{DbPool, Config};
+use kbooks_common::khnum::errors::ServiceError;
 
-use crate::khnum::users::repository::user_handler;
-use crate::khnum::users::models::{SlimUser, User};
+use kbooks_common::khnum::users::repository::user_handler;
+use kbooks_common::khnum::users::models::{SlimUser, User};
 use crate::khnum::users::utils::{hash_password, to_url, from_url};
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -3,8 +3,8 @@ use chrono::{Duration, Local};
 use jsonwebtoken::{decode, encode, Header, Validation};
 use percent_encoding::{utf8_percent_encode, percent_decode, AsciiSet, CONTROLS};
 
-use crate::khnum::errors::ServiceError;
-use crate::khnum::users::models::SlimUser;
+use kbooks_common::khnum::errors::ServiceError;
+use kbooks_common::khnum::users::models::SlimUser;
 
 // cf. https://github.com/servo/rust-url/blob/master/UPGRADING.md#upgrading-from-percent-encoding-1x-to-2x
 // and https://docs.rs/url/1.4.0/src/url/percent_encoding.rs.html#63

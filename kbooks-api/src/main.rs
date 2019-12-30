@@ -1,7 +1,6 @@
 #![feature(proc_macro_hygiene)]
 #![allow(unused_imports)]
 
-#[macro_use] extern crate diesel;
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate lazy_static;
 //For tests
@@ -20,15 +19,11 @@ use dotenv::dotenv;
 use actix_i18n::Translations;
 use gettext_macros::{compile_i18n, include_i18n, init_i18n};
 
-use crate::khnum::wiring;
+use kbooks_common::khnum::wiring;
 
 init_i18n!("khnum", en, fr); // Put this before modules containing messages to be translated
 
 mod khnum;
-
-mod schema;
-mod models;
-mod repository;
 mod controllers;
 
 // fn hello(

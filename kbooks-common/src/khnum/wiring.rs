@@ -1,20 +1,21 @@
 use diesel::prelude::{Connection, PgConnection, SqliteConnection};
 use diesel::r2d2;
-use num_cpus;
-use futures::future::Future;
-use crate::khnum::errors::ServiceError;
 
 // #[cfg(not(any(feature = "sqlite", feature = "postgres")))]
 // compile_error!("Either feature \"sqlite\" or \"postgres\" must be enabled for this crate.");
 // #[cfg(all(feature = "sqlite", feature = "postgres"))]
 // compile_error!("Features \"sqlite\" and \"postgres\" should not be enabled at the same time.");
 
-// #[cfg(all(feature = "sqlite", not(feature = "postgres")))]
-#[cfg(test)]
+// #[cfg(feature = "diesel/sqlite")]
+// #[cfg(all(feature = "diesel/sqlite", not(feature = "diesel/postgres")))]
+// #[cfg(test)]
+#[cfg(feature = "test")]
 pub type MyConnection = SqliteConnection;
 
-// #[cfg(all(not(feature = "sqlite"), feature = "postgres"))]
-#[cfg(not(test))]
+// #[cfg(not(feature = "diesel/sqlite"))]
+// #[cfg(all(not(feature = "diesel/sqlite"), feature = "diesel/postgres"))]
+// #[cfg(not(test))]
+#[cfg(not(feature = "test"))]
 pub type MyConnection = PgConnection;
 
 pub type DbPool = r2d2::Pool<r2d2::ConnectionManager<MyConnection>>;
@@ -35,12 +36,14 @@ pub fn db_init(db_url: String) -> DbPool {
 }
 
 // ================== Test database initialization
-// #[cfg(feature = "sqlite")]
-#[cfg(test)]
-embed_migrations!("migrations/sqlite");
+// #[cfg(feature = "diesel/sqlite")]
+// #[cfg(test)]
+#[cfg(feature = "test")]
+embed_migrations!("../migrations/sqlite");
 
-// #[cfg(feature = "sqlite")]
-#[cfg(test)]
+// #[cfg(feature = "diesel/sqlite")]
+#[cfg(feature = "test")]
+// #[cfg(test)]
 pub fn test_conn_init() -> DbPool {
     let manager = r2d2::ConnectionManager::<MyConnection>::new(":memory:");
     let pool = r2d2::Pool::builder().max_size(2).build(manager).expect("Failed to create pool.");

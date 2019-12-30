@@ -10,9 +10,21 @@ edition = "2018"
 bcrypt = "0.6.1"
 chrono = { version = "0.4.10", features = ["serde"] }
 
+derive_more = "0.99.2"
+serde= "1.0.103"
+serde_derive= "1.0.103"
+serde_json= "1.0.44"
+
 diesel = { version = "1.4.3", features = ["postgres", "sqlite", "uuid", "r2d2", "chrono"] }
 diesel_migrations = "1.4.0"
 r2d2 = "0.8.7"
 uuid = { version = "0.8.1", features = ["serde", "v4"] }
 
+actix = { version = "0.8.3", features = ["http"] }
+actix-web = "2.0.0-alpha.6"
 
+[features]
+default = ["postgres"]
+postgres = ["diesel/postgres"]
+test = ["diesel/sqlite"]
+debug-mailer = []

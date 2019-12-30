@@ -4,12 +4,12 @@ use actix_web::{web, Error, error::BlockingError, HttpRequest, HttpResponse, Res
 
 use futures::future::Future;
 
-use crate::khnum::wiring::{DbPool, Config};
-use crate::khnum::errors::ServiceError;
+use kbooks_common::khnum::wiring::{Config};
+use kbooks_common::khnum::errors::ServiceError;
 
-use crate::khnum::users::repository::auth_handler;
+use kbooks_common::khnum::users::repository::auth_handler;
 // use crate::khnum::users::utils::create_token; //for JWT token
-use crate::khnum::users::models;
+use kbooks_common::khnum::users::models;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthData {

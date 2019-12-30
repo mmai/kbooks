@@ -8,10 +8,11 @@ migrate:
 # sentry: 
 # 	docker-compose -f sentry-docker-compose.yml up 
 test:
-	cargo +nightly-2019-11-29 test
-	# cargo test
+	cargo +nightly-2019-11-29 test --features test
+	# cargo test --features test
 coverage:
 	# launch tests & coverage, for tests only: "cargo test"
+	# TODO  add features test
 	cargo +nightly tarpaulin -v
 run:
 	# cargo watch -x run

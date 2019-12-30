@@ -13,11 +13,11 @@ use lettre::file::FileTransport;
 use lettre::smtp::authentication::{Credentials, Mechanism};
 use lettre::sendmail::SendmailTransport;
 
-use crate::khnum::wiring::{DbPool, Config, make_front_url};
-use crate::khnum::errors::ServiceError;
+use kbooks_common::khnum::wiring::{DbPool, Config, make_front_url};
+use kbooks_common::khnum::errors::ServiceError;
 
-use crate::khnum::users::repository::user_handler;
-use crate::khnum::users::models::{SlimUser, User};
+use kbooks_common::khnum::users::repository::user_handler;
+use kbooks_common::khnum::users::models::{SlimUser, User};
 use crate::khnum::users::utils::{hash_password, to_url, from_url};
 
 use actix_i18n::I18n;
@@ -154,7 +154,7 @@ fn check_existence(pool: DbPool, email: &String, login: &String) -> Result<Comma
         }
         Err(err) => {
             println!("Error when looking unicity : {}", err);
-            Err(err)
+            Err(err.into())
         }
     }
 }

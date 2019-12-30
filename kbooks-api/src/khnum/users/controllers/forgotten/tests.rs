@@ -8,15 +8,15 @@ use futures::future::Future;
 use super::CommandResult;
 
 use diesel::prelude::*;
-use crate::khnum::schema::users::dsl;
-use crate::khnum::users::models::{SlimUser, User, NewUser};
-use crate::khnum::wiring::Config;
+use kbooks_common::khnum::schema::users::dsl;
+use kbooks_common::khnum::users::models::{SlimUser, User, NewUser};
+use kbooks_common::khnum::wiring::Config;
 
 #[actix_rt::test]
 async fn test_request() {
     dotenv().ok();
     let srv = test::start( || {
-        let pool = crate::khnum::wiring::test_conn_init();
+        let pool = kbooks_common::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
         let user = NewUser::with_details(String::from("login"), String::from("email@toto.fr"), String::from("password"), String::from("fr_FR"));
@@ -62,7 +62,7 @@ use regex::Regex;
 async fn test_link() {
     dotenv().ok();
     let mut srv = test::start( move || {
-        let pool = crate::khnum::wiring::test_conn_init();
+        let pool = kbooks_common::khnum::wiring::test_conn_init();
         //Insert test data 
         let conn = &pool.get().unwrap();
         let user = NewUser::with_details(String::from("login"), String::from("email@test.fr"), String::from("password"), String::from("fr_FR"));
