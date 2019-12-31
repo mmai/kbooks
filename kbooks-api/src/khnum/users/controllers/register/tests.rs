@@ -16,6 +16,15 @@ use kbooks_common::khnum::wiring::Config;
 use actix_i18n::Translations;
 use gettext_macros::include_i18n;
 
+use std::fs::File;
+use std::io::prelude::*;
+
+fn error_log(mess: &str) -> std::io::Result<()> {
+    let mut logfile = File::create("/tmp/kbooks_test_error.log")?;
+    logfile.write(mess.as_bytes())?;
+    Ok(())
+}
+
 pub fn managed_state() -> Translations {
     include_i18n!()
 }
@@ -49,6 +58,7 @@ async fn test_request() {
         password: String::from("totop")
     };
 
+    error_log("test register request");
     let req = srv.post("/register/request")
         .timeout(Duration::new(15, 0));
         // .header( http::header::CONTENT_TYPE, http::header::HeaderValue::from_static("application/json"),);

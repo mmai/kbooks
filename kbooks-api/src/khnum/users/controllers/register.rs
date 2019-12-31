@@ -24,6 +24,17 @@ use actix_i18n::I18n;
 use gettext::Catalog;
 use gettext_macros::i18n;
 
+
+use std::fs::File;
+use std::io::prelude::*;
+
+fn error_log(mess: &str) -> std::io::Result<()> {
+    let mut logfile = File::create("/tmp/kbooks-api_error.log")?;
+    logfile.write(mess.as_bytes())?;
+    Ok(())
+}
+
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CommandResult {
     success: bool,
@@ -45,21 +56,27 @@ pub async fn request(
     config: web::Data<Config>,
     i18n: I18n
 ) -> Result<HttpResponse, ServiceError> {
+    error_log("request...");
     let form_data = form_data.into_inner();
     let res = check_existence(config.pool.clone(), &form_data.email, &form_data.username);
+    error_log("apres res...");
     match res {
         Ok(cde_res) => {
             if !cde_res.success {
+                error_log("not comde res...");
                 Ok(HttpResponse::Ok().json(cde_res))
             } else {
+                error_log("yes comde res...");
                 let hashed_password = hash_password(&form_data.password).expect("Error hashing password");
                 let expires_at = Local::now().naive_local() + Duration::hours(24);
                 // panic!(" avant send_confirmation");
                 let res = send_confirmation(&i18n.catalog, form_data.username, hashed_password, form_data.email, expires_at);
+                error_log("apres confirm...");
                 Ok(HttpResponse::Ok().json(res))
             }
         }
         Err(err) => {
+            error_log(&format!("check existence {:?}", err));
            Err(err)
         }
     }

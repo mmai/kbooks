@@ -8,7 +8,8 @@ migrate:
 # sentry: 
 # 	docker-compose -f sentry-docker-compose.yml up 
 test:
-	cargo +nightly-2019-11-29 test --features test
+	cd kbooks-api && cargo +nightly test --features test
+	# cargo +nightly-2019-11-29 test --features test
 	# cargo test --features test
 coverage:
 	# launch tests & coverage, for tests only: "cargo test"
