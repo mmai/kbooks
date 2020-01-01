@@ -19,6 +19,15 @@ use kbooks_common::khnum::users::repository::user_handler;
 use kbooks_common::khnum::users::models::{SlimUser, User};
 use crate::khnum::users::utils::{hash_password, to_url, from_url};
 
+use std::fs::File;
+use std::io::prelude::*;
+
+fn error_log(mess: &str) -> std::io::Result<()> {
+    let mut logfile = File::create("/tmp/kbooks-api_error.log")?;
+    logfile.write(mess.as_bytes())?;
+    Ok(())
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CommandResult {
     success: bool,
@@ -37,6 +46,7 @@ pub async fn request(
     form_data: web::Form<RequestForm>,
     config: web::Data<Config>
 ) -> Result<HttpResponse, ServiceError> {
+    error_log("forgotten request...");
     let form_data = form_data.into_inner();
 
     let email_exists = user_handler::email_exists(config.pool.clone(), &form_data.email).expect("error when checking email");

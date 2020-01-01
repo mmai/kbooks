@@ -56,7 +56,7 @@ pub async fn request(
     config: web::Data<Config>,
     i18n: I18n
 ) -> Result<HttpResponse, ServiceError> {
-    error_log("request...");
+    error_log("register request...");
     let form_data = form_data.into_inner();
     let res = check_existence(config.pool.clone(), &form_data.email, &form_data.username);
     error_log("apres res...");
