@@ -140,7 +140,7 @@ async fn test_create() {
         let pool = kbooks_common::khnum::wiring::test_conn_init();
         let conn = &pool.get().unwrap();
         App::new()
-            .data(managed_state())
+            .app_data(managed_state())
             .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")}).service(
                                                                                                 web::scope("/book")
                                                                                                 .service( web::resource("/create").route(
@@ -200,7 +200,7 @@ async fn test_list() {
         diesel::insert_into(dsl::books).values(&book)
             .execute(conn).expect("Error populating test database");
         App::new()
-            .data(managed_state())
+            .app_data(managed_state())
             .data(Config {pool: pool.clone(), front_url: String::from("http://dummy")})
             .service( web::resource("/book")
                       .route( web::get().to(list))

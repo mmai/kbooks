@@ -12,10 +12,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-# kbooks-api/src/khnum/users/controllers/register.rs:205
+# kbooks-api/src/khnum/users/controllers/register.rs:199
 msgid "Please click on the link below to complete registration"
 msgstr ""
 
-# kbooks-api/src/khnum/users/controllers/register.rs:206
+# kbooks-api/src/khnum/users/controllers/register.rs:200
 msgid "your Invitation expires on"
 msgstr ""

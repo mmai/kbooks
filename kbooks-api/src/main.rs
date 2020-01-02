@@ -60,7 +60,7 @@ async fn main() -> std::io::Result<()> {
                 pool: pool.clone(),
                 front_url: front_url.clone()
             })
-            .data(managed_state())
+            .app_data(managed_state())
             .wrap(Logger::default())
             .wrap(CookieSession::signed(secret.as_bytes()).secure(false))
             // .wrap(IdentityService::new(
