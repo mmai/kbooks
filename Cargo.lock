@@ -491,7 +491,7 @@ dependencies = [
 
 [[package]]
 name = "actix_i18n"
-version = "0.6.1"
+version = "0.6.0"
 dependencies = [
  "actix-web 2.0.0-rc (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1427,7 +1427,7 @@ dependencies = [
  "actix-rt 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-session 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-web 2.0.0-rc (registry+https://github.com/rust-lang/crates.io-index)",
- "actix_i18n 0.6.1",
+ "actix_i18n 0.6.0",
  "awc 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "bcrypt 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",

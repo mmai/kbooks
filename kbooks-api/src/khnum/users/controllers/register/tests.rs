@@ -64,7 +64,10 @@ async fn test_request() {
         // .header( http::header::CONTENT_TYPE, http::header::HeaderValue::from_static("application/json"),);
 
     let mut response = req.send_form(&form).await.unwrap();
-    println!("{:#?}", response);
+    if (!response.status().is_success()){
+        println!("{:#?}", response);
+        println!("-- body: {:?}", response.body().await);
+    }
     assert!(response.status().is_success());
     let result: CommandResult = response.json().await.expect("Could not parse json"); 
     assert!(result.success);
