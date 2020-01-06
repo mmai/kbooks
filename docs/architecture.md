@@ -1,5 +1,17 @@
 # Architecture
 
+## Configuration
+
+Sub projects :
+
+kbooks-common : core application, with database access
+kbooks-cli: command line interface
+kbooks-api
+  web server with actix
+
+Configuration values are set in _.env_ file
+They are red by the _kbooks-common_ package which is used by _kbooks-api_ and _kbooks-cli_
+
 ## Errors
 
 * cf. https://gill.net.in/posts/auth-microservice-rust-actix-web1.0-diesel-complete-tutorial/
