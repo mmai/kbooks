@@ -1,5 +1,8 @@
 Aardwolf https://github.com/Aardwolf-Social
 
+?? https://github.com/KyleU/generust
+?? https://github.com/lloydmeta/todddo-openapi-rs (DDD ; uses paperclip pour interface swagger)
+
 plume
 
 ## User management

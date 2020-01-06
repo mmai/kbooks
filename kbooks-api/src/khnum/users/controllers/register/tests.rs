@@ -60,7 +60,7 @@ async fn test_request() {
     }
     assert!(response.status().is_success());
     let result: CommandResult = response.json().await.expect("Could not parse json"); 
-    assert!(result.success);
+    assert!(result.is_success());
 
     //======== Test request with already registered email
     let existing_user = super::RequestForm {
@@ -74,8 +74,8 @@ async fn test_request() {
     let mut response = req.send_form(&existing_user).await.unwrap();
     assert!(response.status().is_success());
     let result: CommandResult = response.json().await.expect("Could not parse json"); 
-    assert!(!result.success);
-    assert_eq!(Some(String::from("Email already taken")), result.error);
+    assert!(!result.clone().is_success());
+    assert_eq!(Some(String::from("Email already taken")), result.get_error());
 }
 
 use regex::Regex;
@@ -141,8 +141,8 @@ async fn test_validate() {
     println!("response : {:#?}", response);
     assert!(response.status().is_success());
     let result: CommandResult = response.json().await.expect("Could not parse json"); 
-    assert!(!result.success);
-    assert_eq!(Some(String::from("Email already taken")), result.error);
+    assert!(!result.clone().is_success());
+    assert_eq!(Some(String::from("Email already taken")), result.get_error());
 
     // ----------- Registering with same username should now fail
     // 1. Mock register request
@@ -157,8 +157,8 @@ async fn test_validate() {
     // let mut response = req.send_form(&form).await.unwrap();
     assert!(response.status().is_success());
     let result: CommandResult = response.json().await.expect("Could not parse json"); 
-    assert!(!result.success);
-    assert_eq!(Some(String::from("Username already taken")), result.error);
+    assert!(!result.clone().is_success());
+    assert_eq!(Some(String::from("Username already taken")), result.get_error());
 
     // ================ Bad link
     //
@@ -169,8 +169,8 @@ async fn test_validate() {
     println!("{:?}", response2.status());
     assert!(response2.status().is_success());
     let result: CommandResult = response2.json().await.expect("Could not parse json"); 
-    assert!(!result.success);
-    assert_eq!(Some(String::from("Incorrect link")), result.error);
+    assert!(!result.clone().is_success());
+    assert_eq!(Some(String::from("Incorrect link")), result.get_error());
 
     // ================ Link validity expired
     //
@@ -179,8 +179,8 @@ async fn test_validate() {
     // println!("response : {:#?}", response);
     assert!(response.status().is_success());
     let result: CommandResult = response.json().await.expect("Could not parse json"); 
-    assert!(!result.success);
-    assert_eq!(Some(String::from("Link validity expired")), result.error);
+    assert!(!result.clone().is_success());
+    assert_eq!(Some(String::from("Link validity expired")), result.get_error());
 }
 
 fn keep_session(response: awc::ClientResponse<impl futures::stream::Stream>, request: awc::ClientRequest) -> awc::ClientRequest {

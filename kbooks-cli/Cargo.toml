@@ -1,9 +1,14 @@
 [package]
 name = "kbooks-cli"
 version = "0.1.0"
-authors = ["Henri Bourcereau <hbourcereau@atixnet.fr>"]
+authors = ["Henri Bourcereau <henri@bourcereau.fr>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = "2.33.0"
+
+[dependencies.kbooks-common]
+path = "../kbooks-common"
+

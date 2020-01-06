@@ -8,9 +8,9 @@ use crate::khnum::wiring::DbPool;
 use crate::khnum::schema::users::dsl;
 use crate::khnum::users::models::{SlimUser, User, NewUser};
 
-pub fn add(pool: DbPool, email: String, login: String, password: String, language: &'static str) -> Result<SlimUser, DBError> {
+pub fn add(pool: DbPool, email: &str, login: &str, password: &str, language: &'static str) -> Result<SlimUser, DBError> {
     let conn = &pool.get().unwrap();
-    let user = NewUser::with_details(login, email, password, String::from(language));
+    let user = NewUser::with_details(String::from(login), String::from(email), String::from(password), String::from(language));
     #[cfg(not(feature = "test"))]
     let inserted_user: User = diesel::insert_into(dsl::users).values(&user).get_result(conn)?;
     #[cfg(feature = "test")]
@@ -51,7 +51,7 @@ pub fn email_exists(pool: DbPool, email: &String) -> Result<bool, DBError> {
     // }
 }
 
-pub fn fetch(pool: DbPool, email: &String, login: &String) -> Result<Vec<SlimUser>, DBError> {
+pub fn fetch(pool: DbPool, email: &str, login: &str) -> Result<Vec<SlimUser>, DBError> {
     use crate::khnum::schema::users::dsl;
     let conn = &pool.get().unwrap();
     let items = dsl::users.filter(

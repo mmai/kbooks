@@ -1,5 +1,6 @@
 /target
 kbooks-api/target
+kbooks-cli/target
 **/*.rs.bk
 .env
 static/*

@@ -25,6 +25,37 @@ pub struct Config {
     pub front_url: String
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CommandResult {
+    success: bool,
+    error: Option<String>
+}
+
+impl CommandResult {
+    pub fn get_error(self) -> Option<String> {
+        self.error
+    }
+
+    pub fn is_success(self) -> bool {
+        self.success
+    }
+
+    pub fn success() -> CommandResult {
+        CommandResult {
+            success: true,
+            error: None
+        }
+    }
+
+    pub fn error(message: String) -> CommandResult {
+        CommandResult {
+            success: false,
+            error: Some(message)
+        }
+    }
+}
+
+
 pub fn make_front_url (root_url: &String, url: &str) -> String {
     format!("{}/#{}", root_url, url)
 }

@@ -1,5 +1,7 @@
 # TODO
 
+* Command line
+
 ## dev environment
 
 * [x] travis (test service ) ?
@@ -26,6 +28,10 @@
 
 ## architecture
 
-* [ ] rust workspaces (~ symfony bundles ?)
+* [x] rust workspaces (~ symfony bundles ?)
 * [ ] error_log https://actix.rs/docs/errors/ (then sentry)
 * [ ] CQRS (cf. https://github.com/KodrAus/rust-web-app )
+
+## sysadmin
+
+* [ ] deployment

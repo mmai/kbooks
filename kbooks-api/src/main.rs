@@ -13,7 +13,6 @@ use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use actix_session::{CookieSession, Session};
 // use chrono::Duration;
-use diesel::{r2d2::ConnectionManager};
 use dotenv::dotenv;
 
 use actix_i18n::Translations;

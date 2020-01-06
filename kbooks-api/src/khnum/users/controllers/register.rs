@@ -13,11 +13,12 @@ use lettre::file::FileTransport;
 use lettre::smtp::authentication::{Credentials, Mechanism};
 use lettre::sendmail::SendmailTransport;
 
-use kbooks_common::khnum::wiring::{DbPool, Config, make_front_url};
+use kbooks_common::khnum::wiring::{DbPool, Config, CommandResult, make_front_url};
 use kbooks_common::khnum::errors::ServiceError;
 
 use kbooks_common::khnum::users::repository::user_handler;
 use kbooks_common::khnum::users::models::{SlimUser, User};
+use kbooks_common::khnum::users::operations::check_existence;
 use crate::khnum::users::utils::{hash_password, to_url, from_url};
 
 use actix_i18n::I18n;
@@ -33,12 +34,6 @@ fn error_log(mess: &str) {
     logfile.write(mess.as_bytes()).unwrap();
 }
 
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CommandResult {
-    success: bool,
-    error: Option<String>
-}
 
 // ---------------- Request Action------------
 
@@ -59,7 +54,7 @@ pub async fn request(
     let res = check_existence(config.pool.clone(), &form_data.email, &form_data.username);
     match res {
         Ok(cde_res) => {
-            if !cde_res.success {
+            if !cde_res.clone().is_success() {
                 Ok(HttpResponse::Ok().json(cde_res))
             } else {
                 let hashed_password = hash_password(&form_data.password).expect("Error hashing password");
@@ -95,23 +90,23 @@ pub async fn register(
 
     let validate_result = verify(local_link.clone(), &hashlink[..])
         .map_err(|_err| 
-            CommandResult { success: false, error: Some(String::from("Invalid hash link")) }
+            CommandResult::error(String::from("Invalid hash link"))
         )
         .map(|is_valid| {
             if !is_valid {
-                return CommandResult { success: false, error: Some(String::from("Incorrect link")) };
+                return CommandResult::error(String::from("Incorrect link"));
             }
             let now = Local::now().naive_local().timestamp();
             if expires_at < now {
-                return CommandResult { success: false, error: Some(String::from("Link validity expired")) };
+                return CommandResult::error(String::from("Link validity expired")) ;
             }
             
             let check_existence_res = check_existence(config.pool.clone(), &email, &username).expect("error when checking existence");
-            if !check_existence_res.success {
+            if !check_existence_res.clone().is_success() {
                 check_existence_res
             } else {
-                let _user = user_handler::add(config.pool.clone(), email, username, hpasswd, &i18n.lang).expect("error when inserting new user");
-                CommandResult {success: true, error: None}
+                let _user = user_handler::add(config.pool.clone(), &email, &username, &hpasswd, &i18n.lang).expect("error when inserting new user");
+                CommandResult::success()
             }
 
         });
@@ -119,7 +114,7 @@ pub async fn register(
     match validate_result {
         Err(res) => Ok(HttpResponse::Ok().json(res)),
         Ok(res) => {
-            if res.success {
+            if res.clone().is_success() {
                 // let _ = session.set("flashmessage", "Thank your for registering. You can now log in");
                 // let cookie: Cookie = Cookie::build("action", "registerOk")
                 //     .domain("localhost:8080")
@@ -147,27 +142,6 @@ pub async fn register(
 pub struct ValidateForm {
     username: String,
     password: String,
-}
-
-fn check_existence(pool: DbPool, email: &String, login: &String) -> Result<CommandResult, ServiceError> {
-    let res = user_handler::fetch(pool, email, login);
-    match res {
-        Ok(users) => {
-            if users.len() == 0 {
-                return Ok(CommandResult {success: true, error: None});
-            }
-            let mut err_message = "Username already taken";
-            let same_email: Vec<&SlimUser> = users.iter().filter(|user| &user.email == email).collect();
-            if same_email.len() > 0 {
-                err_message = "Email already taken";
-            }
-            Ok(CommandResult {success: false, error: Some(String::from(err_message))})
-        }
-        Err(err) => {
-            println!("Error when looking unicity : {}", err);
-            Err(err.into())
-        }
-    }
 }
 
 fn make_confirmation_data(msg: &str) -> String {
@@ -225,7 +199,7 @@ fn send_confirmation(catalog: &Catalog, username: String, hpassword: String, ema
 
     // We don't send the mail in test environment
     #[cfg(test)]
-    return CommandResult {success: true, error: None};
+    return CommandResult::success();
 
     // let mut mailer = SmtpClient::new_unencrypted_localhost().unwrap().transport();
     let sendmail = dotenv::var("SENDMAIL").unwrap_or_else(|_| "/usr/sbin/sendmail".to_string()); 
@@ -233,10 +207,10 @@ fn send_confirmation(catalog: &Catalog, username: String, hpassword: String, ema
 
     let result = mailer.send(email.unwrap().into());
     match result {
-        Ok(_res) => CommandResult {success: true, error: None} ,
+        Ok(_res) => CommandResult::success(),
         Err(error) => {
             // println!("error \n {:#?}", error);
-            CommandResult {success: false, error: Some(format!("Error sending mail. {:#?}", error))}
+            CommandResult::error(format!("Error sending mail. {:#?}", error))
         }
     }
 }
