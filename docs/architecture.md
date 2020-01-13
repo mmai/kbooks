@@ -1,5 +1,9 @@
 # Architecture
 
+## Nix
+
+Nix files follows the same structure as https://github.com/Tokyo-NixOS/presentations/tree/master/2017/02/examples/binserver
+
 ## Configuration
 
 Sub projects :

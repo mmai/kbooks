@@ -1,25 +1,16 @@
-with import <nixpkgs> { };
+/* Derivation file for the binserver project
+   callPackage style is used for better integration with nixpkgs.
+*/
 
-# troubleshooting : if error libmariadb.so.x not found => reinstall diesel_cli (cargo install diesel_cli --no-default-features --features postgres,sqlite)
+/* 
+  For improved determinism, nixpkgs version can be pinned to a specific version or even commit:
 
-stdenv.mkDerivation rec {
-  name = "kbooks-${version}";
-  version = "0.1.0";
-  buildInputs = with pkgs; [ 
-    # rustup
-    openssl pkgconfig # needed for installing various cargo packages
-    postgresql mysql sqlite # needed for `cargo install diesel_cli`
-    docker_compose 
+    { pkgs ? import (fetchTarball https://github.com/nixos/nixpkgs-channels/archive/nixos-16.09.tar.gz) {} }:
+    { pkgs ? import (fetchTarball https://github.com/nixos/nixpkgs-channels/archive/nixos-unstable.tar.gz) {} }:
+    { pkgs ? import (fetchTarball https://github.com/nixos/nixpkgs/58d44a3.tar.gz) {} }:
 
-    # needed for app
-    gettext
-  ];
+*/
 
-  # (DATABASE_URL env variable overrides value in .env file)
-  shellHook = ''
-    export DATABASE_URL=postgres://dbuser:password@localhost:5432/kbooks
-    which diesel >/dev/null 2>&1 || cargo install diesel_cli
-    which cargo-tarpaulin >/dev/null 2>&1 || cargo install cargo-tarpaulin
-  '';
+{ pkgs ? import <nixpkgs> {} }:
 
-}
+pkgs.callPackage ./derivation.nix {}
