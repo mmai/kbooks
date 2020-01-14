@@ -1,3 +1,8 @@
+.DEFAULT_GOAL := build
+build:
+	cargo +nightly build
+install:
+	cargo +nightly install
 services:
 	docker-compose up -d
 initdb: services
