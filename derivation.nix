@@ -1,6 +1,6 @@
 # { lib, rustPlatform }:
 # rustPlatform.buildRustPackage rec {
-{ stdenv, lib, fetchFromGitHub, makeRustPlatform, pkgs, pkgconfig, openssl, postgresql, sqlite}:
+{ lib, fetchFromGitHub, makeRustPlatform, pkgs, pkgconfig, openssl, postgresql, sqlite, gettext}:
 let
   mozRepo = fetchFromGitHub {
     owner = "mozilla";
@@ -19,24 +19,26 @@ let
 in
 
 nightlyRustPlatform.buildRustPackage rec {
-# stdenv.mkDerivation rec {
   pname = "kbooks";
   version = "0.1.0";
   cargoSha256 = "0mbf6rknm2g3dg8mw7r4060mxnzlay87cxwfvm7qksrm8zbbm1qk";
   src = ./.;
 
-  # buildPhase = "${channel.cargo}/bin/cargo build";
-  # installPhase = "${channel.cargo}/bin/cargo install";
-
   buildInputs = [
     pkgconfig
     openssl
     postgresql sqlite
-    # gcc
-    # nettle
-    # clang
-    # llvmPackages.libclang
+    gettext
   ];
+
+  # doCheck = false;
+  checkPhase = ''
+    runHook preCheck
+    echo "Running cargo test on kbooks-api"
+    cd kbooks-api && cargo test --features test
+    cd -
+    runHook postCheck
+  '';
 
   meta = {
     description = "Books management";
