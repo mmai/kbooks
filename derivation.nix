@@ -1,4 +1,4 @@
-# { lib, rustPlatform }:
+# { lib, rustPlatform, pkgconfig, openssl, postgresql, sqlite, gettext}:
 # rustPlatform.buildRustPackage rec {
 { lib, fetchFromGitHub, makeRustPlatform, pkgs, pkgconfig, openssl, postgresql, sqlite, gettext}:
 let
