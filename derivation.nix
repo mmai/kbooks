@@ -1,6 +1,6 @@
 # { lib, rustPlatform }:
 # rustPlatform.buildRustPackage rec {
-{ stdenv, lib, fetchFromGitHub, makeRustPlatform, pkgs }:
+{ stdenv, lib, fetchFromGitHub, makeRustPlatform, pkgs, pkgconfig, openssl, postgresql, sqlite}:
 let
   mozRepo = fetchFromGitHub {
     owner = "mozilla";
@@ -12,21 +12,31 @@ let
   # where they use it as an overlay rather than a separate package set
   mozPkgs = import "${mozRepo}/package-set.nix" { inherit pkgs; };
   channel = mozPkgs.rustChannelOf { date = "2019-11-29"; channel = "nightly"; };
-  # nightlyRustPlatform = makeRustPlatform {
-  #   rustc = channel.rust;
-  #   cargo = channel.cargo;
-  # };
+  nightlyRustPlatform = makeRustPlatform {
+    rustc = channel.rust;
+    cargo = channel.cargo;
+  };
 in
 
-# nightlyRustPlatform.buildRustPackage rec {
-stdenv.mkDerivation rec {
+nightlyRustPlatform.buildRustPackage rec {
+# stdenv.mkDerivation rec {
   pname = "kbooks";
-  version = "0.0.1";
-  # cargoSha256 = "1iga3320mgi7m853la55xip514a3chqsdi1a1rwv25lr9b1p7vd3";
+  version = "0.1.0";
+  cargoSha256 = "0mbf6rknm2g3dg8mw7r4060mxnzlay87cxwfvm7qksrm8zbbm1qk";
   src = ./.;
 
-  buildPhase = "${channel.cargo}/bin/cargo build";
-  installPhase = "${channel.cargo}/bin/cargo install";
+  # buildPhase = "${channel.cargo}/bin/cargo build";
+  # installPhase = "${channel.cargo}/bin/cargo install";
+
+  buildInputs = [
+    pkgconfig
+    openssl
+    postgresql sqlite
+    # gcc
+    # nettle
+    # clang
+    # llvmPackages.libclang
+  ];
 
   meta = {
     description = "Books management";

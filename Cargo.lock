@@ -492,6 +492,7 @@ dependencies = [
 [[package]]
 name = "actix_i18n"
 version = "0.6.1"
+source = "git+https://github.com/mmai/actix_i18n?branch=actix-2.0#74c034ffe4f0013f1476f01694924ebbadd7b6d2"
 dependencies = [
  "actix-web 2.0.0-rc (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1449,7 +1450,7 @@ dependencies = [
  "actix-rt 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-session 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-web 2.0.0-rc (registry+https://github.com/rust-lang/crates.io-index)",
- "actix_i18n 0.6.1",
+ "actix_i18n 0.6.1 (git+https://github.com/mmai/actix_i18n?branch=actix-2.0)",
  "awc 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "bcrypt 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3043,6 +3044,7 @@ dependencies = [
 "checksum actix-web 2.0.0-rc (registry+https://github.com/rust-lang/crates.io-index)" = "9ca77a79f044f2ede682fee8fb2314e884da61e95c4e4b8d56fb6152994213ca"
 "checksum actix-web-codegen 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de0878b30e62623770a4713a6338329fd0119703bafc211d3e4144f4d4a7bdd5"
 "checksum actix_derive 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0bf5f6d7bf2d220ae8b4a7ae02a572bb35b7c4806b24049af905ab8110de156c"
+"checksum actix_i18n 0.6.1 (git+https://github.com/mmai/actix_i18n?branch=actix-2.0)" = "<none>"
 "checksum adler32 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "5d2e7343e7fc9de883d1b0341e0b13970f764c14101234857d2ddafa1cb1cac2"
 "checksum ahash 0.2.18 (registry+https://github.com/rust-lang/crates.io-index)" = "6f33b5018f120946c1dcf279194f238a9f146725593ead1c08fa47ff22b0b5d3"
 "checksum aho-corasick 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)" = "58fb5e95d83b38284460a5fda7d6470aa0b8844d283a0b614b8535e880800d2d"

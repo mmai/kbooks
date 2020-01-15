@@ -51,9 +51,10 @@ uuid = { version = "0.8.1", features = ["serde", "v4"] }
 path = "../kbooks-common"
 
 [dependencies.actix_i18n]
-version = "0.6"
-# git = "https://github.com/mmai/actix_i18n"
-path = "../../actix_i18n"
+version = "0.6.1"
+git = "https://github.com/mmai/actix_i18n"
+branch = "actix-2.0"
+# path = "../../actix_i18n"
 
 [features]
 default = []
