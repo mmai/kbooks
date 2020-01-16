@@ -138,6 +138,38 @@ in
         example = "kbooks.yourdomain.net";
       };
 
+      protocol = mkOption {
+        type = types.enum [ "http" "https" ];
+        default = "https";
+        description = ''
+            Web server protocol.
+        '';
+      };
+
+        apiIp = mkOption {
+          type = types.str;
+          default = "127.0.0.1";
+          description = ''
+            Kbooks API IP.
+          '';
+        };
+
+        webWorkers = mkOption {
+          type = types.int;
+          default = 1;
+          description = ''
+            Kbooks number of web workers.
+          '';
+        };
+
+        apiPort = mkOption {
+          type = types.port;
+          default = 8080;
+          description = ''
+            Kbooks API Port.
+          '';
+        };
+
       base_url = mkOption {
         type = types.str;
         description = ''
@@ -215,15 +247,125 @@ in
       ];
     };
 
+      services.nginx = {
+        enable = true;
+        appendHttpConfig = ''
+          upstream kbooks-api {
+          server ${cfg.apiIp}:${toString cfg.apiPort};
+          }
+        '';
+        virtualHosts = 
+        let proxyConfig = ''
+          # global proxy conf
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-Host $host:$server_port;
+          proxy_set_header X-Forwarded-Port $server_port;
+          proxy_redirect off;
+
+          # websocket support
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection $connection_upgrade;
+        '';
+        withSSL = cfg.protocol == "https";
+        in {
+          "${cfg.hostname}" = {
+            enableACME = withSSL;
+            forceSSL = withSSL;
+            root = "${pkgs.funkwhale}/front";
+          # gzip config is nixos nginx recommendedGzipSettings with gzip_types from funkwhale doc (https://docs.funkwhale.audio/changelog.html#id5)
+            extraConfig = ''
+              add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; media-src 'self' data:";
+              add_header Referrer-Policy "strict-origin-when-cross-origin";
+
+              gzip on;
+              gzip_disable "msie6";
+              gzip_proxied any;
+              gzip_comp_level 5;
+              gzip_types
+              application/javascript
+              application/vnd.geo+json
+              application/vnd.ms-fontobject
+              application/x-font-ttf
+              application/x-web-app-manifest+json
+              font/opentype
+              image/bmp
+              image/svg+xml
+              image/x-icon
+              text/cache-manifest
+              text/css
+              text/plain
+              text/vcard
+              text/vnd.rim.location.xloc
+              text/vtt
+              text/x-component
+              text/x-cross-domain-policy;
+              gzip_vary on;
+            '';
+            locations = {
+              "/" = { 
+                extraConfig = proxyConfig;
+                proxyPass = "http://kbooks-api/";
+              };
+            };
+          };
+        };
+      };
 
     environment.systemPackages = [ kbooksPackage ];
 
-    systemd.services.kbooks = { 
-      after    = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
-      serviceConfig = { 
-        ExecStart = "${kbooksPackage}/bin/kbooks-api";
-        Restart   = "always";
+    systemd.targets.kbooks = {
+      description = "Kbooks";
+      wants = ["funkwhale-server.service"];
+    }; 
+    systemd.services = 
+    let serviceConfig = {
+      User = "${cfg.user}";
+      WorkingDirectory = "${pkgs.kbooks}";
+      EnvironmentFile =  "${kbooksEnvFile}";
+    };
+    in { 
+      kbooks-psql-init = mkIf cfg.database.createLocally {
+        description = "Kbooks database preparation";
+        after = [ "postgresql.service" ];
+        wantedBy = [ "kbooks-init.service" ];
+        before   = [ "kbooks-init.service" ];
+        serviceConfig = {
+          User = "postgres";
+          ExecStart = '' ${config.services.postgresql.package}/bin/psql -d ${cfg.database.name}  -c 'CREATE EXTENSION IF NOT EXISTS "unaccent";' '';
+        };
+      };
+      kbooks-init = {
+        description = "Kbooks initialization";
+        wantedBy = [ "kbooks-server.service" ];
+        before   = [ "kbooks-server.service" ];
+        environment = kbooksEnv;
+        serviceConfig = {
+          User = "${cfg.user}";
+          Group = "${cfg.group}";
+        };
+        script = ''
+          # TODO : Create datadir & symkink .env ?
+
+          # TODO : init / migrate database -> embed in executable ?
+          diesel setup --config-file diesel-khnum.toml --migration-dir migrations/khnum/postgres/
+          diesel migration run --config-file diesel-khnum.toml --migration-dir migrations/khnum/postgres/
+          diesel migration run --migration-dir migrations/postgres/
+
+          # TODO : Create superuser ?
+        '';
+      };
+      kbooks-server = { 
+        partOf    = [ "kbooks.target" ];
+        after    = [ "network.target" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = { 
+          ExecStart = "${kbooksPackage}/bin/kbooks-api";
+          Restart   = "always";
+        };
       };
     };
   };
