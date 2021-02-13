@@ -351,9 +351,9 @@ in
           # TODO : Create datadir & symkink .env ?
 
           # TODO : init / migrate database -> embed in executable ?
-          diesel setup --config-file diesel-khnum.toml --migration-dir migrations/khnum/postgres/
-          diesel migration run --config-file diesel-khnum.toml --migration-dir migrations/khnum/postgres/
-          diesel migration run --migration-dir migrations/postgres/
+          ${pkgs.diesel-cli}/bin/diesel setup --config-file diesel-khnum.toml --migration-dir migrations/khnum/postgres/
+          ${pkgs.diesel-cli}/bin/diesel migration run --config-file diesel-khnum.toml --migration-dir migrations/khnum/postgres/
+          ${pkgs.diesel-cli}/bin/diesel migration run --migration-dir migrations/postgres/
 
           # TODO : Create superuser ?
         '';

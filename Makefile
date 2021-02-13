@@ -28,3 +28,5 @@ run:
 	cargo +nightly-2019-11-29 run -p kbooks-api
 doc:
 	cargo +nightly doc --open
+cachix:
+	nix build | cachix push mmai
