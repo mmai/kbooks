@@ -15,7 +15,7 @@ serde= "1.0.103"
 serde_derive= "1.0.103"
 serde_json= "1.0.44"
 
-diesel = { version = "1.4.3", features = ["postgres", "sqlite", "uuid", "r2d2", "chrono"] }
+diesel = { version = "1.4.6", features = ["postgres", "sqlite", "uuid", "r2d2", "chrono"] }
 diesel_migrations = "1.4.0"
 r2d2 = "0.8.7"
 uuid = { version = "0.8.1", features = ["serde", "v4"] }
