@@ -43,7 +43,7 @@ gettext-macros = { git = "https://github.com/Plume-org/gettext-macros/", rev = "
 gettext-utils = { git = "https://github.com/Plume-org/gettext-macros/", rev = "a7c605f7edd6bfbfbfe7778026bfefd88d82db10" }
 
 bcrypt = "0.6.1"
-diesel = { version = "1.4.3", features = ["postgres", "sqlite", "uuid", "r2d2", "chrono"] }
+diesel = { version = "1.4.6", features = ["postgres", "sqlite", "uuid", "r2d2", "chrono"] }
 diesel_migrations = "1.4.0"
 uuid = { version = "0.8.1", features = ["serde", "v4"] }
 
